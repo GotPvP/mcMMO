@@ -18,6 +18,7 @@ import com.gmail.nossr50.datatypes.skills.SubSkillType;
 import com.gmail.nossr50.datatypes.skills.SuperAbilityType;
 import com.gmail.nossr50.datatypes.skills.ToolType;
 import com.gmail.nossr50.events.experience.McMMOPlayerPreXpGainEvent;
+import com.gmail.nossr50.events.skills.abilities.McMMOPlayerAbilityActivateEvent;
 import com.gmail.nossr50.locale.LocaleLoader;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.party.PartyManager;
@@ -911,10 +912,6 @@ public class McMMOPlayer implements Identified {
             return;
         }
 
-        if (EventUtils.callPlayerAbilityActivateEvent(player, primarySkillType).isCancelled()) {
-            return;
-        }
-
         //These values change depending on whether the server is in retro mode
         int abilityLengthVar = mcMMO.p.getAdvancedConfig().getAbilityLength();
         int abilityLengthCap = mcMMO.p.getAdvancedConfig().getAbilityLengthCap();
@@ -928,6 +925,14 @@ public class McMMOPlayer implements Identified {
         } else {
             ticks = PerksUtils.handleActivationPerks(player, 2 + (getSkillLevel(primarySkillType) / abilityLengthVar), superAbilityType.getMaxLength());
         }
+
+        McMMOPlayerAbilityActivateEvent event = EventUtils.callPlayerAbilityActivateEvent(player, primarySkillType, ticks);
+
+        if (event.isCancelled()) {
+            return;
+        }
+
+        ticks += event.getBoostedTicks();
 
         if (useChatNotifications()) {
             NotificationManager.sendPlayerInformation(player, NotificationType.SUPER_ABILITY, superAbilityType.getAbilityOn());
