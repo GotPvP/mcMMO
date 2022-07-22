@@ -170,8 +170,8 @@ public final class EventUtils {
      * Others
      */
 
-    public static @NotNull McMMOPlayerAbilityActivateEvent callPlayerAbilityActivateEvent(@NotNull Player player, @NotNull PrimarySkillType skill) {
-        McMMOPlayerAbilityActivateEvent event = new McMMOPlayerAbilityActivateEvent(player, skill);
+    public static @NotNull McMMOPlayerAbilityActivateEvent callPlayerAbilityActivateEvent(@NotNull Player player, @NotNull PrimarySkillType skill, int ticks) {
+        McMMOPlayerAbilityActivateEvent event = new McMMOPlayerAbilityActivateEvent(player, skill, ticks);
         mcMMO.p.getServer().getPluginManager().callEvent(event);
 
         return event;

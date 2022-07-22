@@ -35,7 +35,7 @@
         </snapshotRepository>
     </distributionManagement>
     <build>
-        <finalName>${project.artifactId}</finalName>
+        <finalName>OP${project.artifactId}</finalName>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
         <resources>
             <resource>
