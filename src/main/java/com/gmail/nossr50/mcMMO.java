@@ -57,6 +57,7 @@ import net.shatteredlands.shatt.backup.ZipLibrary;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -147,6 +148,8 @@ public class mcMMO extends JavaPlugin {
 //    private FishingTreasureConfig fishingTreasureConfig;
 //    private SoundConfig soundConfig;
 
+    public static NamespacedKey nskOPMobStackerStackSize;
+
     public mcMMO() {
         p = this;
     }
@@ -164,6 +167,9 @@ public class mcMMO extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
+            nskOPMobStackerStackSize = new NamespacedKey("opmobstacker", "stacksize");
+            getLogger().info("OPMobStacker NSK: " + nskOPMobStackerStackSize.toString());
+
             setupFilePaths();
             generalConfig = new GeneralConfig(getDataFolder()); //Load before skillTools
             skillTools = new SkillTools(this); //Load after general config
