@@ -5,8 +5,12 @@ import com.gmail.nossr50.datatypes.experience.XPGainReason;
 import com.gmail.nossr50.datatypes.experience.XPGainSource;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
+import com.gmail.nossr50.mcMMO;
+import org.bukkit.attribute.Attribute;
 import com.gmail.nossr50.util.CancellableRunnable;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class AwardCombatXpTask extends CancellableRunnable {
     private final McMMOPlayer mcMMOPlayer;
@@ -32,7 +36,12 @@ public class AwardCombatXpTask extends CancellableRunnable {
 
         // May avoid negative xp, we don't know what other plugins do with the entity health
         if (damage <= 0) {
-            return;
+            // PATCH: OPMobStacker kills do 0 damage when mobs are 1 shot, set damage to the mob's max health
+            if (mcMMO.nskOPMobStackerStackSize != null && target.getPersistentDataContainer().has(mcMMO.nskOPMobStackerStackSize, PersistentDataType.INTEGER)) {
+                damage = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+            } else {
+                return;
+            }
         }
 
         // Don't reward the player for overkills
