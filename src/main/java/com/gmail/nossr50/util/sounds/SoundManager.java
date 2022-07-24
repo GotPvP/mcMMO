@@ -1,11 +1,9 @@
 package com.gmail.nossr50.util.sounds;
 
 import com.gmail.nossr50.config.SoundConfig;
+import com.gmail.nossr50.events.sound.McMMOPlayerReceiveSoundEvent;
 import com.gmail.nossr50.util.Misc;
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 public class SoundManager {
@@ -13,24 +11,29 @@ public class SoundManager {
      * Sends a sound to the player
      * @param soundType the type of sound
      */
-    public static void sendSound(Player player, Location location, SoundType soundType)
-    {
-        if(SoundConfig.getInstance().getIsEnabled(soundType))
-            player.playSound(location, getSound(soundType), SoundCategory.MASTER, getVolume(soundType), getPitch(soundType));
+    public static void sendSound(Player player, Location location, SoundType soundType) {
+        sendCategorizedSound(player, location, soundType, SoundCategory.MASTER, 0.0f);
     }
 
     public static void sendCategorizedSound(Player player, Location location, SoundType soundType, SoundCategory soundCategory)
     {
-        if(SoundConfig.getInstance().getIsEnabled(soundType))
-            player.playSound(location, getSound(soundType), soundCategory, getVolume(soundType), getPitch(soundType));
+        sendCategorizedSound(player, location, soundType, soundCategory, 0.0f);
     }
 
     public static void sendCategorizedSound(Player player, Location location, SoundType soundType, SoundCategory soundCategory, float pitchModifier)
     {
-        float totalPitch = Math.min(2.0F, (getPitch(soundType) + pitchModifier));
+        if (SoundConfig.getInstance().getIsEnabled(soundType)) {
+            McMMOPlayerReceiveSoundEvent event = new McMMOPlayerReceiveSoundEvent(player, location, soundType);
+            Bukkit.getPluginManager().callEvent(event);
 
-        if(SoundConfig.getInstance().getIsEnabled(soundType))
-            player.playSound(location, getSound(soundType), soundCategory, getVolume(soundType), totalPitch);
+            if (!event.isCancelled()) {
+                float totalPitch = Math.min(2.0F, (getPitch(soundType) + pitchModifier));
+                location = event.getLocation();
+                soundType = event.getSoundType();
+
+                player.playSound(location, getSound(soundType), soundCategory, getVolume(soundType), totalPitch);
+            }
+        }
     }
 
     public static void worldSendSound(World world, Location location, SoundType soundType)
