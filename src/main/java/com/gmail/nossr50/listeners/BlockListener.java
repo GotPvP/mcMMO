@@ -243,6 +243,9 @@ public class BlockListener implements Listener {
             }
         }
 
+        if (!Repair.anvilEnabled) {
+            return;
+        }
 
         Player player = event.getPlayer();
 

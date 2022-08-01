@@ -8,5 +8,7 @@ public class Repair {
     public static int    repairMasteryMaxBonusLevel = mcMMO.p.getAdvancedConfig().getMaxBonusLevel(SubSkillType.REPAIR_REPAIR_MASTERY);
     public static double repairMasteryMaxBonus      = mcMMO.p.getAdvancedConfig().getRepairMasteryMaxBonus();
 
+    public static boolean anvilEnabled  = false;
     public static Material anvilMaterial  = mcMMO.p.getGeneralConfig().getRepairAnvilMaterial();
+
 }

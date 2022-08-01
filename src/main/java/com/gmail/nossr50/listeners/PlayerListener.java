@@ -636,6 +636,10 @@ public class PlayerListener implements Listener {
      */
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerInteractLowest(PlayerInteractEvent event) {
+        if (!Repair.anvilEnabled) {
+            return;
+        }
+
         /* WORLD BLACKLIST CHECK */
         if(WorldBlacklist.isWorldBlacklisted(event.getPlayer().getWorld()))
             return;
