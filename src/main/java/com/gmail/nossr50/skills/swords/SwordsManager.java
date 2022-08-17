@@ -22,6 +22,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 public class SwordsManager extends SkillManager {
@@ -61,8 +62,9 @@ public class SwordsManager extends SkillManager {
      * @param target The defending entity
      */
     public void processRupture(@NotNull LivingEntity target) {
-        if(!canUseRupture())
+        if (!canUseRupture() || target.getPersistentDataContainer().has(mcMMO.nskOPMobStackerStackSize, PersistentDataType.INTEGER)) {
             return;
+        }
 
         if(target.hasMetadata(MetadataConstants.METADATA_KEY_RUPTURE)) {
             RuptureTaskMeta ruptureTaskMeta = (RuptureTaskMeta) target.getMetadata(MetadataConstants.METADATA_KEY_RUPTURE).get(0);
