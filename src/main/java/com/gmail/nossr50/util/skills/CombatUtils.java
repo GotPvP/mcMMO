@@ -114,7 +114,7 @@ public final class CombatUtils {
     }
 
     private static void processAxeCombat(@NotNull LivingEntity target, @NotNull Player player, @NotNull EntityDamageByEntityEvent event) {
-        if (event.getCause() == DamageCause.THORNS) {
+        if (event.getCause() == DamageCause.THORNS || target instanceof Player) {
             return;
         }
 
@@ -164,7 +164,7 @@ public final class CombatUtils {
     }
 
     private static void processUnarmedCombat(@NotNull LivingEntity target, @NotNull Player player, @NotNull EntityDamageByEntityEvent event) {
-        if (event.getCause() == DamageCause.THORNS) {
+        if (event.getCause() == DamageCause.THORNS || target instanceof Player) {
             return;
         }
 
@@ -246,7 +246,7 @@ public final class CombatUtils {
         McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
 
         //Make sure the profiles been loaded
-        if(mcMMOPlayer == null) {
+        if(mcMMOPlayer == null || target instanceof Player) {
             cleanupArrowMetadata(arrow);
             return;
         }
@@ -675,6 +675,10 @@ public final class CombatUtils {
         for (Entity entity : target.getNearbyEntities(2.5, 2.5, 2.5)) {
             if (numberOfTargets <= 0) {
                 break;
+            }
+
+            if (entity instanceof Player) {
+                continue;
             }
 
             if ((ExperienceConfig.getInstance().isNPCInteractionPrevented() && Misc.isNPCEntityExcludingVillagers(entity))

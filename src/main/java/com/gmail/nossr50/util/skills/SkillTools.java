@@ -354,7 +354,7 @@ public class SkillTools {
     }
 
     public boolean canCombatSkillsTrigger(PrimarySkillType primarySkillType, Entity target) {
-        return (target instanceof Player || (target instanceof Tameable && ((Tameable) target).isTamed())) ? getPVPEnabled(primarySkillType) : getPVEEnabled(primarySkillType);
+        return (!(target instanceof Player) && (target instanceof Tameable && ((Tameable) target).isTamed())) ? getPVPEnabled(primarySkillType) : getPVEEnabled(primarySkillType);
     }
 
     public String getCapitalizedPrimarySkillName(PrimarySkillType primarySkillType) {

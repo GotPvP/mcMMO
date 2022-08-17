@@ -67,7 +67,7 @@ public class AcrobaticsManager extends SkillManager {
     }
 
     public boolean canDodge(Entity damager) {
-        if(getPlayer().isBlocking())
+        if(getPlayer().isBlocking() || damager instanceof Player)
             return false;
 
         if(!RankUtils.hasUnlockedSubskill(getPlayer(), SubSkillType.ACROBATICS_DODGE))
