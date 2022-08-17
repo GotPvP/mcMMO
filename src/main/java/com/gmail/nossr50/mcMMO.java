@@ -15,6 +15,7 @@ import com.gmail.nossr50.config.treasure.FishingTreasureConfig;
 import com.gmail.nossr50.config.treasure.TreasureConfig;
 import com.gmail.nossr50.database.DatabaseManager;
 import com.gmail.nossr50.database.DatabaseManagerFactory;
+import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.datatypes.skills.subskills.acrobatics.Roll;
 import com.gmail.nossr50.listeners.*;
@@ -327,6 +328,16 @@ public class mcMMO extends JavaPlugin {
 
         transientEntityTracker = new TransientEntityTracker();
         setServerShutdown(false); //Reset flag, used to make decisions about async saves
+
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
+
+                if (mcMMOPlayer != null) {
+                    mcMMOPlayer.handleXP();
+                }
+            });
+        }, 0, 20 * 3);
     }
 
     public static PlayerLevelUtils getPlayerLevelUtils() {
@@ -389,7 +400,7 @@ public class mcMMO extends JavaPlugin {
                 ZipLibrary.mcMMOBackup();
             } catch(NoClassDefFoundError e) {
                 getLogger().severe("Backup class not found!");
-                getLogger().info("Please do not replace the mcMMO jar while the server is running."); 
+                getLogger().info("Please do not replace the mcMMO jar while the server is running.");
             } catch (Throwable e) {
                 getLogger().severe(e.toString());
             }

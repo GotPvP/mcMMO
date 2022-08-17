@@ -31,7 +31,7 @@ public class AwardCombatXpTask extends BukkitRunnable {
     @Override
     public void run() {
         double health = target.getHealth();
-        double damage = baseHealth - health;
+        double damage = target.getHealth() == target.getMaxHealth() / 2 ? target.getHealth() : baseHealth - health;
 
         // May avoid negative xp, we don't know what other plugins do with the entity health
         if (damage <= 0) {
