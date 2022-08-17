@@ -98,9 +98,11 @@ public final class PartyManager {
         if (party != null) {
             Player player = mmoPlayer.getPlayer();
             double range = pluginRef.getGeneralConfig().getPartyShareRange();
+            Player player = mcMMOPlayer.getPlayer();
+            // double range = mcMMO.p.getGeneralConfig().getPartyShareRange();
 
             for (Player member : party.getOnlineMembers()) {
-                if (!player.equals(member) && member.isValid() && Misc.isNear(player.getLocation(), member.getLocation(), range)) {
+                if (!player.equals(member) && member.isValid() /* && Misc.isNear(player.getLocation(), member.getLocation(), range) */) {
                     nearMembers.add(member);
                 }
             }
@@ -649,7 +651,7 @@ public final class PartyManager {
     /**
      * Load party file.
      */
-    public void loadParties() {
+    public static void loadParties() {
         if (!pluginRef.getPartyConfig().isPartyEnabled() || !partyFile.exists()) {
             return;
         }
