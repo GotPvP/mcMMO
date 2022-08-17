@@ -45,7 +45,7 @@ public class UnarmedManager extends SkillManager {
     }
 
     public boolean canDisarm(LivingEntity target) {
-        if(!RankUtils.hasUnlockedSubskill(getPlayer(), SubSkillType.UNARMED_DISARM))
+        if(target instanceof Player || !RankUtils.hasUnlockedSubskill(getPlayer(), SubSkillType.UNARMED_DISARM))
             return false;
 
         return target instanceof Player && ((Player) target).getInventory().getItemInMainHand().getType() != Material.AIR && Permissions.isSubSkillEnabled(getPlayer(), SubSkillType.UNARMED_DISARM);
