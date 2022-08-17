@@ -67,10 +67,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class McMMOPlayer implements Identified {
     private final @NotNull Identity identity;
@@ -600,6 +597,8 @@ public class McMMOPlayer implements Identified {
         return this.getPowerLevel() >= mcMMO.p.getGeneralConfig().getPowerLevelCap();
     }
 
+    private HashMap<PrimarySkillType, HashMap<XPGainReason, HashMap<XPGainSource, Float>>> xpCache = new HashMap<>();
+
     /**
      * Begins an experience gain. The amount will be affected by skill modifiers, global rate, perks, and may be shared with the party
      *
@@ -607,11 +606,19 @@ public class McMMOPlayer implements Identified {
      * @param xp Experience amount to process
      */
     public void beginXpGain(PrimarySkillType skill, float xp, XPGainReason xpGainReason, XPGainSource xpGainSource) {
-        if(xp <= 0) {
+        if (xp <= 0) {
             return;
         }
 
-        if (SkillTools.isChildSkill(skill)) {
+        Bukkit.getScheduler().runTaskAsynchronously(mcMMO.p, () -> {
+            HashMap<XPGainReason, HashMap<XPGainSource, Float>> skillMap = xpCache.getOrDefault(skill, new HashMap<>());
+            HashMap<XPGainSource, Float> xpSourceMap = skillMap.getOrDefault(xpGainReason, new HashMap<>());
+            xpSourceMap.put(xpGainSource, xpSourceMap.getOrDefault(xpGainSource, 0f) + xp);
+            skillMap.put(xpGainReason, xpSourceMap);
+            xpCache.put(skill, skillMap);
+        });
+
+        /*if (SkillTools.isChildSkill(skill)) {
             Set<PrimarySkillType> parentSkills = FamilyTree.getParents(skill);
             float splitXp = xp / parentSkills.size();
 
@@ -629,7 +636,38 @@ public class McMMOPlayer implements Identified {
             return;
         }
 
-        beginUnsharedXpGain(skill, xp, xpGainReason, xpGainSource);
+        beginUnsharedXpGain(skill, xp, xpGainReason, xpGainSource);*/
+    }
+
+    public void handleXP() {
+        HashMap<PrimarySkillType, HashMap<XPGainReason, HashMap<XPGainSource, Float>>> xpMap = xpCache;
+        xpCache = new HashMap<>();
+
+        xpMap.forEach((skill, skillMap) -> {
+            skillMap.forEach(((xpGainReason, xpGainSourceMap) -> {
+                xpGainSourceMap.forEach((xpGainSource, xp) -> {
+                    if (SkillTools.isChildSkill(skill)) {
+                        Set<PrimarySkillType> parentSkills = FamilyTree.getParents(skill);
+                        float splitXp = xp / parentSkills.size();
+
+                        for (PrimarySkillType parentSkill : parentSkills) {
+                            if (mcMMO.p.getSkillTools().doesPlayerHaveSkillPermission(player, parentSkill)) {
+                                beginXpGain(parentSkill, splitXp, xpGainReason, xpGainSource);
+                            }
+                        }
+
+                        return;
+                    }
+
+                    // Return if the experience has been shared
+                    if (party != null && ShareHandler.handleXpShare(xp, this, skill, ShareHandler.getSharedXpGainReason(xpGainReason))) {
+                        return;
+                    }
+
+                    beginUnsharedXpGain(skill, xp, xpGainReason, xpGainSource);
+                });
+            }));
+        });
     }
 
     /**
