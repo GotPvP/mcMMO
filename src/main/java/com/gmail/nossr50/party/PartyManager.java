@@ -152,10 +152,10 @@ public final class PartyManager {
 
         if (party != null) {
             Player player = mcMMOPlayer.getPlayer();
-            double range = mcMMO.p.getGeneralConfig().getPartyShareRange();
+            // double range = mcMMO.p.getGeneralConfig().getPartyShareRange();
 
             for (Player member : party.getOnlineMembers()) {
-                if (!player.equals(member) && member.isValid() && Misc.isNear(player.getLocation(), member.getLocation(), range)) {
+                if (!player.equals(member) && member.isValid() /* && Misc.isNear(player.getLocation(), member.getLocation(), range) */) {
                     nearMembers.add(member);
                 }
             }
