@@ -108,6 +108,4 @@ public class WorldGuardManager {
             System.out.println("[mcMMO] Could not register WG Flags!"); //Don't use the Logger here
         }
     }
-
-
 }
