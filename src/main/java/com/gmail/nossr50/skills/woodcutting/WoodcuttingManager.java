@@ -310,12 +310,23 @@ public class WoodcuttingManager extends SkillManager {
                 for (ItemStack stack : blockDrops.get(type)) {
                     int itemAmount = stack.getAmount() * amount;
 
+                    if (itemAmount <= 0) {
+                        continue;
+                    }
+
+                    int its = 0;
+
                     do {
+                        ++its;
                         ItemStack drop = new ItemStack(stack.getType());
                         drop.setAmount(Math.min(itemAmount, drop.getMaxStackSize()));
 
                         itemAmount -= drop.getAmount();
                         drops.add(drop);
+
+                        if (its > 10) {
+                            break; // sanity
+                        }
                     } while (itemAmount > 0);
                 }
             }
