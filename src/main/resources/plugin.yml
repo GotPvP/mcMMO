@@ -139,6 +139,7 @@ commands:
         description: Detailed mcMMO skill info
         permission: mcmmo.commands.repair
     fishing:
+        aliases: [mcfishing]
         description: Detailed mcMMO skill info
         permission: mcmmo.commands.fishing
     smelting:

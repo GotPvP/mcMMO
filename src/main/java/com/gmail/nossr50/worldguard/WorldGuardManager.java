@@ -95,7 +95,7 @@ public class WorldGuardManager {
                 registry.register(WorldGuardFlags.MCMMO_XP_WG_FLAG);
                 registry.register(WorldGuardFlags.MCMMO_HARDCORE_WG_FLAG);
                 mcMMO.p.getLogger().info("Registered WG flags successfully!");
-            } catch (FlagConflictException e) {
+            } catch (FlagConflictException | IllegalStateException e) {
                 e.printStackTrace();
                 mcMMO.p.getLogger().warning("Failed to register WG flags!");
                 // some other plugin registered a flag by the same name already.
@@ -107,6 +107,4 @@ public class WorldGuardManager {
             System.out.println("[mcMMO] Could not register WG Flags!"); //Don't use the Logger here
         }
     }
-
-
 }

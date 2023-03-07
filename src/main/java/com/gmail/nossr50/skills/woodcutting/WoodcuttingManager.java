@@ -29,10 +29,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class WoodcuttingManager extends SkillManager {
     private boolean treeFellerReachedThreshold = false;
@@ -268,57 +265,100 @@ public class WoodcuttingManager extends SkillManager {
      * @param treeFellerBlocks List of blocks to be dropped
      */
     private void dropTreeFellerLootFromBlocks(@NotNull Set<BlockState> treeFellerBlocks) {
+        if (treeFellerBlocks.isEmpty()) {
+            return;
+        }
+
+        Map<Material, Integer> blocks = new HashMap<>();
+        Map<Material, Collection<ItemStack>> blockDrops = new HashMap<>();
+
         Player player = getPlayer();
-        int xp = 0;
-        int processedLogCount = 0;
         ItemStack itemStack = player.getInventory().getItemInMainHand();
 
+        boolean lenient = player.getWorld().getName().startsWith("islands-");
+
         for (BlockState blockState : treeFellerBlocks) {
-            int beforeXP = xp;
             Block block = blockState.getBlock();
 
-            if (!EventUtils.simulateBlockBreak(block, player, true)) {
+            if (!lenient && !EventUtils.simulateBlockBreak(block, player, true)) {
                 continue;
             }
 
-            /*
-             * Handle Drops & XP
-             */
+            Material type = block.getType();
+            blocks.put(type, blocks.getOrDefault(type, 0) + 1);
 
-            if (BlockUtils.hasWoodcuttingXP(blockState)) {
-                //Add XP
-                xp += processTreeFellerXPGains(blockState, processedLogCount);
-
-                //Drop displaced block
-                Misc.spawnItemsFromCollection(getPlayer(), Misc.getBlockCenter(blockState), block.getDrops(itemStack), ItemSpawnReason.TREE_FELLER_DISPLACED_BLOCK);
-
-                //Bonus Drops / Harvest lumber checks
-                processHarvestLumber(blockState);
-            } else if (BlockUtils.isNonWoodPartOfTree(blockState)) {
-                //Drop displaced non-woodcutting XP blocks
-
-                if(RankUtils.hasUnlockedSubskill(player, SubSkillType.WOODCUTTING_KNOCK_ON_WOOD)) {
-                    Misc.spawnItemsFromCollection(getPlayer(), Misc.getBlockCenter(blockState), block.getDrops(itemStack), ItemSpawnReason.TREE_FELLER_DISPLACED_BLOCK);
-
-                    if(RankUtils.hasReachedRank(2, player, SubSkillType.WOODCUTTING_KNOCK_ON_WOOD)) {
-                        if(mcMMO.p.getAdvancedConfig().isKnockOnWoodXPOrbEnabled()) {
-                            if(RandomChanceUtil.rollDice(10, 100)) {
-                                int randOrbCount = Math.max(1, Misc.getRandom().nextInt(100));
-                                Misc.spawnExperienceOrb(blockState.getLocation(), randOrbCount);
-                            }
-                        }
-                    }
-
-                } else {
-                    Misc.spawnItemsFromCollection(getPlayer(), Misc.getBlockCenter(blockState), block.getDrops(itemStack), ItemSpawnReason.TREE_FELLER_DISPLACED_BLOCK, 1);
-                }
+            if (!blockDrops.containsKey(type)) {
+                blockDrops.put(type, block.getDrops(itemStack));
             }
 
             blockState.setType(Material.AIR);
             blockState.update(true);
+        }
 
-            //Update only when XP changes
-            processedLogCount = updateProcessedLogCount(xp, processedLogCount, beforeXP);
+        int xp = 0;
+
+        for (Map.Entry<Material, Integer> entry : blocks.entrySet()) {
+            Material type = entry.getKey();
+            int amount = entry.getValue();
+
+            /*
+             * Handle Drops & XP
+             */
+            Set<ItemStack> drops = new HashSet<>();
+
+            if (blockDrops.containsKey(type)) {
+                for (ItemStack stack : blockDrops.get(type)) {
+                    int itemAmount = stack.getAmount() * amount;
+
+                    if (itemAmount <= 0) {
+                        continue;
+                    }
+
+                    int its = 0;
+
+                    do {
+                        ++its;
+                        ItemStack drop = new ItemStack(stack.getType());
+                        drop.setAmount(Math.min(itemAmount, drop.getMaxStackSize()));
+
+                        itemAmount -= drop.getAmount();
+                        drops.add(drop);
+
+                        if (its > 10) {
+                            break; // sanity
+                        }
+                    } while (itemAmount > 0);
+                }
+            }
+
+            if (BlockUtils.hasWoodcuttingXP(type)) {
+                // Add XP
+                xp += processTreeFellerXPGains(type, entry.getValue());
+
+                // Regular drops
+                Misc.spawnItemsFromCollection(player, player.getLocation(), drops, ItemSpawnReason.TREE_FELLER_DISPLACED_BLOCK);
+
+                // Bonus Drops / Harvest lumber checks
+                Misc.spawnItemsFromCollection(getPlayer(), player.getLocation(), drops, ItemSpawnReason.BONUS_DROPS);
+                // processHarvestLumber(blockState);
+            } else if (BlockUtils.isNonWoodPartOfTree(type)) {
+                // Drop displaced non-woodcutting XP blocks
+
+                if (RankUtils.hasUnlockedSubskill(player, SubSkillType.WOODCUTTING_KNOCK_ON_WOOD)) {
+                    Misc.spawnItemsFromCollection(getPlayer(), player.getLocation(), drops, ItemSpawnReason.TREE_FELLER_DISPLACED_BLOCK);
+
+                    if (RankUtils.hasReachedRank(2, player, SubSkillType.WOODCUTTING_KNOCK_ON_WOOD)) {
+                        if (mcMMO.p.getAdvancedConfig().isKnockOnWoodXPOrbEnabled()) {
+                            if (RandomChanceUtil.rollDice(10, 100)) {
+                                int randOrbCount = Math.max(1, Misc.getRandom().nextInt(100));
+                                Misc.spawnExperienceOrb(player.getLocation(), randOrbCount * amount);
+                            }
+                        }
+                    }
+                } else {
+                    Misc.spawnItemsFromCollection(getPlayer(), player.getLocation(), drops, ItemSpawnReason.TREE_FELLER_DISPLACED_BLOCK, 1);
+                }
+            }
         }
 
         applyXpGain(xp, XPGainReason.PVE);
@@ -345,7 +385,11 @@ public class WoodcuttingManager extends SkillManager {
         if(mcMMO.getPlaceStore().isTrue(blockState))
             return 0;
 
-        int rawXP = ExperienceConfig.getInstance().getXp(PrimarySkillType.WOODCUTTING, blockState.getType());
+        return processTreeFellerXPGains(blockState.getType(), woodCount);
+    }
+
+    private static int processTreeFellerXPGains(Material material, int woodCount) {
+        int rawXP = ExperienceConfig.getInstance().getXp(PrimarySkillType.WOODCUTTING, material);
 
         if(rawXP <= 0)
             return 0;
@@ -355,7 +399,7 @@ public class WoodcuttingManager extends SkillManager {
             rawXP = Math.max(1, reducedXP);
             return rawXP;
         } else {
-            return ExperienceConfig.getInstance().getXp(PrimarySkillType.WOODCUTTING, blockState.getType());
+            return ExperienceConfig.getInstance().getXp(PrimarySkillType.WOODCUTTING, material);
         }
     }
 
@@ -379,6 +423,6 @@ public class WoodcuttingManager extends SkillManager {
      * @param blockState Block being broken
      */
     protected void spawnHarvestLumberBonusDrops(@NotNull BlockState blockState) {
-        Misc.spawnItemsFromCollection(getPlayer(), Misc.getBlockCenter(blockState), blockState.getBlock().getDrops(), ItemSpawnReason.BONUS_DROPS);
+        Misc.spawnItemsFromCollection(getPlayer(), Misc.getBlockCenter(blockState), blockState.getBlock().getDrops(getPlayer().getInventory().getItemInMainHand()), ItemSpawnReason.BONUS_DROPS);
     }
 }

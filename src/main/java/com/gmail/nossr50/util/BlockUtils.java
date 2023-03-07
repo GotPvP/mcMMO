@@ -180,6 +180,16 @@ public final class BlockUtils {
     /**
      * Check if a given block is a log
      *
+     * @param material The {@link Material} of the block to check
+     * @return true if the block is a log, false otherwise
+     */
+    public static boolean hasWoodcuttingXP(@NotNull Material material) {
+        return ExperienceConfig.getInstance().doesBlockGiveSkillXP(PrimarySkillType.WOODCUTTING, material);
+    }
+
+    /**
+     * Check if a given block is a log
+     *
      * @param blockState The {@link BlockState} of the block to check
      * @return true if the block is a log, false otherwise
      */
