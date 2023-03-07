@@ -28,6 +28,8 @@ import com.gmail.nossr50.util.skills.SkillUtils;
 import com.gmail.nossr50.util.sounds.SoundManager;
 import com.gmail.nossr50.util.sounds.SoundType;
 import com.gmail.nossr50.util.text.StringUtils;
+import com.opblocks.overflowbackpacks.CondenseData;
+import com.opblocks.overflowbackpacks.OverflowAPI;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -809,7 +811,8 @@ public class HerbalismManager extends SkillManager {
             return false;
         }
 
-        if (!playerInventory.containsAtLeast(seedStack, 1)) {
+        boolean condensedContains = condensedInventoryContains(player, seedStack.getType());
+        if (!playerInventory.containsAtLeast(seedStack, 1) && !condensedContains) {
             return false;
         }
 
@@ -820,14 +823,24 @@ public class HerbalismManager extends SkillManager {
         if(EventUtils.callSubSkillBlockEvent(player, SubSkillType.HERBALISM_GREEN_THUMB, blockState.getBlock()).isCancelled()) {
             return false;
         } else {
-            playerInventory.removeItem(seedStack);
-            player.updateInventory(); // Needed until replacement available
+            if(condensedContains) {
+                CondenseData condenseData = OverflowAPI.condensedItems.getOrDefault(player.getUniqueId(), new CondenseData(player));
+                condenseData.getItems().put(seedStack.getType(), condenseData.getItems().get(seedStack.getType()) - 1);
+            } else {
+                playerInventory.removeItem(seedStack);
+                player.updateInventory(); // Needed until replacement available
+            }
             //Play sound
             SoundManager.sendSound(player, player.getLocation(), SoundType.ITEM_CONSUMED);
             return true;
         }
 
 //        new HerbalismBlockUpdaterTask(blockState).runTaskLater(mcMMO.p, 0);
+    }
+
+    private boolean condensedInventoryContains(Player player, Material material) {
+        CondenseData condenseData = OverflowAPI.condensedItems.getOrDefault(player.getUniqueId(), new CondenseData(player));
+        return condenseData.getItems().getOrDefault(material, 0) > 0;
     }
 
     private boolean processGrowingPlants(BlockState blockState, Ageable ageable, BlockBreakEvent blockBreakEvent, boolean greenTerra) {
