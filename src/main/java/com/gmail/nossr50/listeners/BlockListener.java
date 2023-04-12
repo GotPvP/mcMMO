@@ -135,12 +135,28 @@ public class BlockListener implements Listener {
             return;
         }
 
+        BlockFace direction = event.getDirection();
+        Block movedBlock = event.getBlock().getRelative(direction);
+
+        if(mcMMO.getPlaceStore().isTrue(movedBlock)) {
+            if(BlockUtils.isWithinWorldBounds(movedBlock.getRelative(direction))) {
+                mcMMO.getPlaceStore().setTrue(movedBlock.getRelative(direction));
+            }
+        }
+
+        for (Block block : event.getBlocks()) {
+            movedBlock = block.getRelative(direction);
         final BlockFace direction = event.getDirection();
 
         for (final Block block : event.getBlocks()) {
             mcMMO.p.getFoliaLib().getImpl().runAtLocation(block.getLocation(), t -> {
                 final Block movedBlock = block.getRelative(direction);
 
+            if(!mcMMO.getPlaceStore().isTrue(movedBlock)) continue;
+            if(BlockUtils.isWithinWorldBounds(movedBlock.getRelative(direction))) {
+                mcMMO.getPlaceStore().setTrue(movedBlock.getRelative(direction));
+                BlockUtils.setUnnaturalBlock(movedBlock);
+            }
                 if (BlockUtils.isWithinWorldBounds(movedBlock)) {
                     BlockUtils.setUnnaturalBlock(movedBlock);
                 }
@@ -166,6 +182,8 @@ public class BlockListener implements Listener {
         // Get opposite direction so we get correct block
         BlockFace direction = event.getDirection();
         Block movedBlock = event.getBlock().getRelative(direction);
+
+        if(!mcMMO.getPlaceStore().isTrue(movedBlock)) return;
 
         //Spigot makes bad things happen in its API
         if(BlockUtils.isWithinWorldBounds(movedBlock)) {
