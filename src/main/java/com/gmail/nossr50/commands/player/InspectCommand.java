@@ -9,6 +9,7 @@ import com.gmail.nossr50.util.Permissions;
 import com.gmail.nossr50.util.commands.CommandUtils;
 import com.gmail.nossr50.util.player.UserManager;
 import com.gmail.nossr50.util.scoreboards.ScoreboardManager;
+import com.gmail.nossr50.util.skills.SkillTools;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -62,6 +63,12 @@ public class InspectCommand implements TabExecutor {
                     sender.sendMessage(CommandUtils.displaySkill(profile, skill));
                 }
 
+                // Sum power level
+                int powerLevel = 0;
+                for (PrimarySkillType skill : SkillTools.NON_CHILD_SKILLS)
+                    powerLevel += profile.getSkillLevel(skill);
+
+                sender.sendMessage(LocaleLoader.getString("Commands.PowerLevel", powerLevel));
             } else {
                 Player target = mcMMOPlayer.getPlayer();
                 boolean isVanished = false;
@@ -95,9 +102,7 @@ public class InspectCommand implements TabExecutor {
                 CommandUtils.printCombatSkills(target, sender);
                 CommandUtils.printMiscSkills(target, sender);
 
-                if (!isVanished) {
-                    sender.sendMessage(LocaleLoader.getString("Commands.PowerLevel", mcMMOPlayer.getPowerLevel()));
-                }
+                sender.sendMessage(LocaleLoader.getString("Commands.PowerLevel", mcMMOPlayer.getPowerLevel()));
             }
 
             return true;

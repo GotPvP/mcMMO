@@ -188,7 +188,7 @@ public class MiningManager extends SkillManager {
 
                 Misc.spawnItem(getPlayer(), Misc.getBlockCenter(blockState), new ItemStack(blockState.getType()), ItemSpawnReason.BLAST_MINING_ORES); // Initial block that would have been dropped
 
-                if (!mcMMO.getPlaceStore().isTrue(blockState)) {
+                if (mcMMO.p.getAdvancedConfig().isBlastMiningBonusDropsEnabled() && !mcMMO.getPlaceStore().isTrue(blockState)) {
                     for (int i = 1; i < dropMultiplier; i++) {
 //                        Bukkit.broadcastMessage("Bonus Drop on Ore: "+blockState.getType().toString());
                         Misc.spawnItem(getPlayer(), Misc.getBlockCenter(blockState), new ItemStack(blockState.getType()), ItemSpawnReason.BLAST_MINING_ORES_BONUS_DROP); // Initial block that would have been dropped
@@ -275,21 +275,16 @@ public class MiningManager extends SkillManager {
      * @return the Blast Mining tier
      */
     public int getDropMultiplier() {
-        switch(getBlastMiningTier()) {
-            case 8:
-            case 7:
-                return 3;
-            case 6:
-            case 5:
-            case 4:
-            case 3:
-                return 2;
-            case 2:
-            case 1:
-                return 1;
-            default:
-                return 0;
+        if (mcMMO.p.getAdvancedConfig().isBlastMiningBonusDropsEnabled()) {
+            return 0;
         }
+
+        return switch (getBlastMiningTier()) {
+            case 8, 7 -> 3;
+            case 6, 5, 4, 3 -> 2;
+            case 2, 1 -> 1;
+            default -> 0;
+        };
     }
 
     /**
