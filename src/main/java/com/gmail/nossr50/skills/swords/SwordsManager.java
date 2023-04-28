@@ -62,7 +62,7 @@ public class SwordsManager extends SkillManager {
      * @param target The defending entity
      */
     public void processRupture(@NotNull LivingEntity target) {
-        if (!canUseRupture() || target instanceof Player || target.getPersistentDataContainer().has(mcMMO.nskOPMobStackerStackSize, PersistentDataType.INTEGER)) {
+        if (true || !canUseRupture() || target instanceof Player || target.getPersistentDataContainer().has(mcMMO.nskOPMobStackerStackSize, PersistentDataType.INTEGER)) {
             return;
         }
 
