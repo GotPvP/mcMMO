@@ -373,8 +373,8 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerFishMonitor(PlayerFishEvent event) {
         /* WORLD BLACKLIST CHECK */
-        if(WorldBlacklist.isWorldBlacklisted(event.getPlayer().getWorld()))
-            return;
+//        if(WorldBlacklist.isWorldBlacklisted(event.getPlayer().getWorld()))
+//            return;
 
         Player player = event.getPlayer();
 
