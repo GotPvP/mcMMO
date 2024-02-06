@@ -765,45 +765,38 @@ public class HerbalismManager extends SkillManager {
 
         Player player = getPlayer();
         PlayerInventory playerInventory = player.getInventory();
-        Material seed;
+        Material[] seedTypes;
 
         switch (blockState.getType().getKey().getKey().toLowerCase(Locale.ROOT)) {
-            case "carrots":
-                seed = Material.matchMaterial("CARROT");
-                break;
-
-            case "wheat":
-                seed = Material.matchMaterial("WHEAT_SEEDS");
-                break;
-
-            case "nether_wart":
-                seed = Material.getMaterial("NETHER_WART");
-                break;
-
-            case "potatoes":
-                seed = Material.matchMaterial("POTATO");
-                break;
-
-            case "beetroots":
-                seed = Material.matchMaterial("BEETROOT_SEEDS");
-                break;
-
-            case "cocoa":
-                seed = Material.matchMaterial("COCOA_BEANS");
-                break;
-
-            case "torchflower":
-                seed = Material.matchMaterial("TORCHFLOWER_SEEDS");
-                break;
-            default:
+            case "wheat" -> seedTypes = new Material[] {
+                Material.WHEAT_SEEDS
+            };
+            case "nether_wart" -> seedTypes = new Material[] {
+                Material.NETHER_WART
+            };
+            case "beetroots" -> seedTypes = new Material[] {
+                Material.BEETROOT_SEEDS
+            };
+            case "cocoa" -> seedTypes = new Material[] {
+                Material.COCOA_BEANS
+            };
+            case "torchflower" -> seedTypes = new Material[] {
+                Material.matchMaterial("TORCHFLOWER_SEEDS")
+            };
+            case "carrots" -> seedTypes = new Material[] {
+                Material.CARROT,
+                Material.GOLDEN_CARROT
+            };
+            case "potatoes" -> seedTypes = new Material[] {
+                Material.POTATO,
+                Material.BAKED_POTATO
+            };
+            default -> {
                 return false;
+            }
         }
 
-
-        ItemStack seedStack = new ItemStack(seed);
-
-        if (ItemUtils.isAxe(blockBreakEvent.getPlayer().getInventory().getItemInMainHand())
-        && blockState.getType() != Material.COCOA) {
+        if (ItemUtils.isAxe(blockBreakEvent.getPlayer().getInventory().getItemInMainHand()) && blockState.getType() != Material.COCOA) {
             return false;
         }
 
@@ -811,8 +804,23 @@ public class HerbalismManager extends SkillManager {
             return false;
         }
 
-        boolean condensedContains = condensedInventoryContains(player, seedStack.getType());
-        if (!playerInventory.containsAtLeast(seedStack, 1) && !condensedContains) {
+        ItemStack seedStack = null;
+
+        boolean inventoryContains = false;
+        boolean condensedContains = false;
+
+        for(Material seedType : seedTypes) {
+            seedStack = new ItemStack(seedType);
+
+            inventoryContains = playerInventory.containsAtLeast(seedStack, 1);
+            condensedContains = this.condensedInventoryContains(player, seedType);
+
+            if(inventoryContains || condensedContains) {
+                break;
+            }
+        }
+
+        if (!inventoryContains && !condensedContains) {
             return false;
         }
 
