@@ -98,7 +98,6 @@ public final class PartyManager {
         if (party != null) {
             Player player = mmoPlayer.getPlayer();
             double range = pluginRef.getGeneralConfig().getPartyShareRange();
-            Player player = mcMMOPlayer.getPlayer();
             // double range = mcMMO.p.getGeneralConfig().getPartyShareRange();
 
             for (Player member : party.getOnlineMembers()) {
@@ -651,7 +650,7 @@ public final class PartyManager {
     /**
      * Load party file.
      */
-    public static void loadParties() {
+    public void loadParties() {
         if (!pluginRef.getPartyConfig().isPartyEnabled() || !partyFile.exists()) {
             return;
         }
