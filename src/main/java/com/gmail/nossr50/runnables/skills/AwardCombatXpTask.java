@@ -8,6 +8,8 @@ import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.mcMMO;
 import org.bukkit.attribute.Attribute;
 import com.gmail.nossr50.util.CancellableRunnable;
+import com.gmail.nossr50.mcMMO;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
