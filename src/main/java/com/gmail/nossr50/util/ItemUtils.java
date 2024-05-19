@@ -518,6 +518,8 @@ public final class ItemUtils {
             case "JUNGLE_LOG":
             case "OAK_LOG":
             case "SPRUCE_LOG":
+            case "MANGROVE_LOG":
+            case "CHERRY_LOG":
             case "STRIPPED_ACACIA_LOG":
             case "STRIPPED_BIRCH_LOG":
             case "STRIPPED_DARK_OAK_LOG":
@@ -525,18 +527,22 @@ public final class ItemUtils {
             case "STRIPPED_OAK_LOG":
             case "STRIPPED_SPRUCE_LOG":
             case "STRIPPED_MANGROVE_LOG":
+            case "STRIPPED_CHERRY_LOG":
             case "ACACIA_SAPLING":
             case "SPRUCE_SAPLING":
             case "BIRCH_SAPLING":
             case "DARK_OAK_SAPLING":
             case "JUNGLE_SAPLING":
             case "OAK_SAPLING":
+            case "CHERRY_SAPLING":
             case "ACACIA_LEAVES":
             case "BIRCH_LEAVES":
             case "DARK_OAK_LEAVES":
             case "JUNGLE_LEAVES":
             case "OAK_LEAVES":
             case "SPRUCE_LEAVES":
+            case "MANGROVE_LEAVES":
+            case "CHERRY_LEAVES":
             case "BEE_NEST":
             case "APPLE":
                 return true;
