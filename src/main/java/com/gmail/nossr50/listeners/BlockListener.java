@@ -27,6 +27,7 @@ import com.gmail.nossr50.util.sounds.SoundManager;
 import com.gmail.nossr50.util.sounds.SoundType;
 import com.gmail.nossr50.worldguard.WorldGuardManager;
 import com.gmail.nossr50.worldguard.WorldGuardUtils;
+import com.opblocks.overflowbackpacks.OverflowAPI;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.Item;

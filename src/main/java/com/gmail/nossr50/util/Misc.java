@@ -7,6 +7,7 @@ import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.runnables.player.PlayerProfileLoadingTask;
 import com.gmail.nossr50.util.player.UserManager;
 import com.google.common.collect.ImmutableSet;
+import com.opblocks.overflowbackpacks.OverflowAPI;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -183,6 +184,17 @@ public final class Misc {
         mcMMO.p.getServer().getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {
+            return null;
+        }
+
+        if(itemSpawnReason == ItemSpawnReason.BONUS_DROPS && OverflowAPI.shouldCondense(itemStack.getType())) {
+            OverflowAPI.withPlayer(player.getUniqueId(), playerData -> {
+                if(playerData.isCondenseItems()) {
+                    OverflowAPI.add(player, itemStack);
+                } else {
+                    location.getWorld().dropItemNaturally(location, itemStack);
+                }
+            }, true);
             return null;
         }
 
