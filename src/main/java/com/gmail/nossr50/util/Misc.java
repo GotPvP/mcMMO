@@ -192,7 +192,12 @@ public final class Misc {
                 if(playerData.isCondenseItems()) {
                     OverflowAPI.add(player, itemStack);
                 } else {
-                    location.getWorld().dropItemNaturally(location, itemStack);
+                    if(!player.hasPermission("feetdrop.disable")) {
+                        Item item = location.getWorld().dropItemNaturally(player.getLocation(), itemStack);
+                        item.setVelocity(item.getVelocity().zero());
+                    } else {
+                        location.getWorld().dropItemNaturally(location, itemStack);
+                    }
                 }
             }, true);
             return null;
