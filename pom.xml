@@ -261,8 +261,9 @@
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.11.3</version>
-            <scope>provided</scope>
+            <version>2.10.3</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/../OPBlocks/lib/PlaceholderAPI-2.10.9.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>co.aikar</groupId>

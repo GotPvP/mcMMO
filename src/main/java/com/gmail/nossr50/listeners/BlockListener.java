@@ -88,7 +88,7 @@ public class BlockListener implements Listener {
         if(blockCount <= 1) {
             for(Item item : event.getItems())
             {
-                ItemStack is = new ItemStack(item.getItemStack());
+                ItemStack is = item.getItemStack();
 
                 if(is.getAmount() <= 0)
                     continue;
@@ -110,9 +110,12 @@ public class BlockListener implements Listener {
                     BonusDropMeta bonusDropMeta = (BonusDropMeta) event.getBlock().getMetadata(MetadataConstants.METADATA_KEY_BONUS_DROPS).get(0);
                     int bonusCount = bonusDropMeta.asInt();
 
-                    for (int i = 0; i < bonusCount; i++) {
-                        Misc.spawnItemNaturally(event.getPlayer(), event.getBlockState().getLocation(), is, ItemSpawnReason.BONUS_DROPS);
-                    }
+                    is.setAmount(is.getAmount() + bonusCount);
+                    item.setItemStack(is);
+
+//                    for (int i = 0; i < bonusCount; i++) {
+//                        Misc.spawnItemNaturally(event.getPlayer(), event.getBlockState().getLocation(), is, ItemSpawnReason.BONUS_DROPS);
+//                    }
                 }
             }
         }
