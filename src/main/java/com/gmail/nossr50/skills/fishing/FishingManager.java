@@ -26,6 +26,7 @@ import com.gmail.nossr50.util.skills.SkillUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
@@ -45,6 +46,7 @@ public class FishingManager extends SkillManager {
     public static final int FISHING_ROD_CAST_CD_MILLISECONDS = 100;
     private final long FISHING_COOLDOWN_SECONDS = 1000L;
 
+    private final NamespacedKey customFishKey;
     private long fishingRodCastTimestamp = 0L;
     private long fishHookSpawnTimestamp = 0L;
     private long lastWarned = 0L;
@@ -58,6 +60,7 @@ public class FishingManager extends SkillManager {
 
     public FishingManager(McMMOPlayer mcMMOPlayer) {
         super(mcMMOPlayer, PrimarySkillType.FISHING);
+        this.customFishKey = new NamespacedKey("masteries", "mastery_rank_item");
     }
 
     public boolean canShake(Entity target) {
@@ -372,6 +375,10 @@ public class FishingManager extends SkillManager {
                 && Permissions.isSubSkillEnabled(getPlayer(), SubSkillType.FISHING_TREASURE_HUNTER);
     }
 
+    private boolean isCustomFish(Entity entity) {
+        return entity.getPersistentDataContainer().has(this.customFishKey);
+    }
+
     /**
      * Process the results from a successful fishing trip
      *
@@ -386,7 +393,8 @@ public class FishingManager extends SkillManager {
         FishingTreasure treasure = null;
         boolean fishingSucceeds = false;
 
-        if (mcMMO.p.getGeneralConfig().getFishingDropsEnabled() && Permissions.isSubSkillEnabled(player, SubSkillType.FISHING_TREASURE_HUNTER)) {
+        if (mcMMO.p.getGeneralConfig().getFishingDropsEnabled() && !this.isCustomFish(fishingCatch)
+                && Permissions.isSubSkillEnabled(player, SubSkillType.FISHING_TREASURE_HUNTER)) {
             treasure = getFishingTreasure();
             this.fishingCatch = null;
         }
