@@ -30,6 +30,7 @@ import com.gmail.nossr50.util.sounds.SoundType;
 import com.gmail.nossr50.util.text.StringUtils;
 import com.opblocks.overflowbackpacks.CondenseData;
 import com.opblocks.overflowbackpacks.OverflowAPI;
+import com.opblocks.skyblock.modifieditems.backpack.util.BackpackUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -833,7 +834,21 @@ public class HerbalismManager extends SkillManager {
         } else {
             if(condensedContains) {
                 CondenseData condenseData = OverflowAPI.condensedItems.getOrDefault(player.getUniqueId(), new CondenseData(player));
-                condenseData.getItems().put(seedStack.getType(), condenseData.getItems().get(seedStack.getType()) - 1);
+                Map<String, Integer> condenseItems = condenseData.getItems();
+
+                String key = seedStack.getType().name();
+
+                int condenseItemCount = condenseItems.getOrDefault(key, 0);
+                if(condenseItemCount > 0) {
+                    condenseItems.put(key, condenseItemCount - 1);
+                } else {
+                    Map<String, Long> items = BackpackUtils.getBackpack(player).getItems();
+
+                    long backpackItemCount = items.getOrDefault(key, 0L);
+                    if(backpackItemCount > 0) {
+                        items.put(key, backpackItemCount - 1);
+                    }
+                }
             } else {
                 playerInventory.removeItem(seedStack);
                 player.updateInventory(); // Needed until replacement available
@@ -847,8 +862,15 @@ public class HerbalismManager extends SkillManager {
     }
 
     private boolean condensedInventoryContains(Player player, Material material) {
+        Map<String, Long> items = BackpackUtils.getBackpack(player).getItems();
+        String key = material.name();
+
+        if(items.getOrDefault(key, 0L) > 0) {
+            return true;
+        }
+
         CondenseData condenseData = OverflowAPI.condensedItems.getOrDefault(player.getUniqueId(), new CondenseData(player));
-        return condenseData.getItems().getOrDefault(material, 0) > 0;
+        return condenseData.getItems().getOrDefault(key, 0) > 0;
     }
 
     private boolean processGrowingPlants(BlockState blockState, Ageable ageable, BlockBreakEvent blockBreakEvent, boolean greenTerra) {
