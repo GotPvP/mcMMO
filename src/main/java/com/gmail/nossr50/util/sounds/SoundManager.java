@@ -43,8 +43,22 @@ public class SoundManager {
     }
 
     public static void worldSendSoundMaxPitch(World world, Location location, SoundType soundType) {
-        if(SoundConfig.getInstance().getIsEnabled(soundType))
-            world.playSound(location, getSound(soundType), getVolume(soundType), 2.0F);
+        float volume = getVolume(soundType);
+        double distance = volume > 1.0F ? 16.0F * volume : 16.0F;
+
+        if(SoundConfig.getInstance().getIsEnabled(soundType)) {
+            for (Player player : world.getPlayers()) {
+                double d4 = location.getX() - player.getLocation().getX();
+                double d5 = location.getY() - player.getLocation().getY();
+                double d6 = location.getZ() - player.getLocation().getZ();
+
+                if (d4 * d4 + d5 * d5 + d6 * d6 < distance * distance) {
+                    sendCategorizedSound(player, location, soundType, SoundCategory.MASTER, 2.0f);
+                }
+            }
+
+            //world.playSound(location, getSound(soundType), getVolume(soundType), 2.0F);
+        }
     }
 
     /**

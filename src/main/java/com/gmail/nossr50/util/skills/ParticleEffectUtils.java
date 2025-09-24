@@ -1,5 +1,6 @@
 package com.gmail.nossr50.util.skills;
 
+import com.gmail.nossr50.config.SoundConfig;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.util.sounds.SoundManager;
 import com.gmail.nossr50.util.sounds.SoundType;
