@@ -439,6 +439,12 @@ public class HerbalismManager extends SkillManager {
             BlockState brokenBlockNewState = brokenPlantBlock.getState();
             BlockData plantData = brokenBlockNewState.getBlockData();
 
+            if (mmoPlayer.isDebugMode()) {
+                mmoPlayer.getPlayer().sendMessage("EXP Reward: " + ExperienceConfig.getInstance().getXp(PrimarySkillType.HERBALISM, brokenBlockNewState.getType()));
+                mmoPlayer.getPlayer().sendMessage("Broken " + brokenBlockNewState.getType());
+                mmoPlayer.getPlayer().sendMessage("In place store? " + mcMMO.getPlaceStore().isTrue(brokenBlockNewState));
+            }
+
             if (mcMMO.getPlaceStore().isTrue(brokenBlockNewState)) {
                 /*
                  *
@@ -446,9 +452,16 @@ public class HerbalismManager extends SkillManager {
                  *
                  *
                  */
+                if (mmoPlayer.isDebugMode()) {
+                    mmoPlayer.getPlayer().sendMessage("Is fully mature? " + isAgeableAndFullyMature(plantData));
+                    mmoPlayer.getPlayer().sendMessage("Is Bizarre Ageable? " + isBizarreAgeable(plantData));
+                }
 
                 //If its a Crop we need to reward XP when its fully grown
                 if (isAgeableAndFullyMature(plantData) && !isBizarreAgeable(plantData)) {
+                    if (mmoPlayer.isDebugMode()) {
+                        mmoPlayer.getPlayer().sendMessage("Rewarding herbalism");
+                    }
                     xpToReward += ExperienceConfig.getInstance().getXp(PrimarySkillType.HERBALISM, brokenBlockNewState.getType());
                 }
 
@@ -462,8 +475,16 @@ public class HerbalismManager extends SkillManager {
                  *
                  */
 
+                if (mmoPlayer.isDebugMode()) {
+                    mmoPlayer.getPlayer().sendMessage("Is ageable? " + (plantData instanceof Ageable));
+                }
+
                 //Calculate XP
                 if (plantData instanceof Ageable plantAgeable) {
+                    if (mmoPlayer.isDebugMode()) {
+                        mmoPlayer.getPlayer().sendMessage("Is fully mature? " + isAgeableAndFullyMature(plantData));
+                        mmoPlayer.getPlayer().sendMessage("Is Bizarre Ageable? " + isBizarreAgeable(plantData));
+                    }
 
                     if (isAgeableMature(plantAgeable) || isBizarreAgeable(plantData)) {
                         xpToReward += ExperienceConfig.getInstance().getXp(PrimarySkillType.HERBALISM, brokenBlockNewState.getType());
