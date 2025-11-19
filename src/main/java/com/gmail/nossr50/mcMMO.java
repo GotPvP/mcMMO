@@ -625,14 +625,16 @@ public class mcMMO extends JavaPlugin {
         PluginManager pluginManager = getServer().getPluginManager();
 
         // Register events
-        pluginManager.registerEvents(new PlayerListener(this), this);
-        pluginManager.registerEvents(new BlockListener(this), this);
-        pluginManager.registerEvents(new EntityListener(this), this);
-        pluginManager.registerEvents(new InventoryListener(this), this);
-        pluginManager.registerEvents(new SelfListener(this), this);
-        pluginManager.registerEvents(new WorldListener(this), this);
-        pluginManager.registerEvents(new ChunkListener(), this);
-//        pluginManager.registerEvents(new CommandListener(this), this);
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            pluginManager.registerEvents(new PlayerListener(this), this);
+            pluginManager.registerEvents(new BlockListener(this), this);
+            pluginManager.registerEvents(new EntityListener(this), this);
+            pluginManager.registerEvents(new InventoryListener(this), this);
+            pluginManager.registerEvents(new SelfListener(this), this);
+            pluginManager.registerEvents(new WorldListener(this), this);
+            pluginManager.registerEvents(new ChunkListener(), this);
+    //        pluginManager.registerEvents(new CommandListener(this), this);
+        }, 200L);
     }
 
     /**

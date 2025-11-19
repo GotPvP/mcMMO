@@ -972,20 +972,12 @@ public class HerbalismManager extends SkillManager {
             case "potatoes":
             case "carrots":
             case "wheat":
-
                 finalAge = getGreenThumbStage(greenTerra);
                 break;
 
             case "beetroots":
             case "nether_wart":
-
-                if (greenTerra || greenThumbStage > 2) {
-                    finalAge = 2;
-                } else if (greenThumbStage == 2) {
-                    finalAge = 1;
-                } else {
-                    finalAge = 0;
-                }
+                finalAge = Math.min(getGreenThumbStage(greenTerra), 3);
                 break;
 
             case "cocoa":
