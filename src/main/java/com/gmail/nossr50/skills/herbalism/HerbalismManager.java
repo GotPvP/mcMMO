@@ -897,14 +897,24 @@ public class HerbalismManager extends SkillManager {
                 if (condenseItemCount > 0) {
                     condenseItems.put(key, condenseItemCount - 1);
                 } else {
-                    final Map<String, com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData> items = com.opblocks.skyblock.modifieditems.backpack.util.BackpackUtils.getBackpack(player).getItems();
-                    final com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData item = items.get(key);
+                    var complete = false;
+                    if (isBackpacksAvailable()) {
+                        final Map<String, com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData> items = com.opblocks.skyblock.modifieditems.backpack.util.BackpackUtils.getBackpack(player).getItems();
+                        final com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData item = items.get(key);
 
-                    if (item != null && item.count() > 0) {
-                        items.put(key, new com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData(
-                            Instant.now(),
-                            item.count() - 1
-                        ));
+                        if (item != null && item.count() > 0) {
+                            items.put(key, new com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData(
+                                    Instant.now(),
+                                    item.count() - 1
+                            ));
+                            complete = true;
+                        }
+                    }
+
+                    if (!complete) {
+                        final var data = OverflowAPI.condensedItems.getOrDefault(player.getUniqueId(), new CondenseData(player));
+                        final var itemCount = data.getItems().get(key);
+                        if (itemCount != null && itemCount > 0) data.getItems().put(key, itemCount - 1);
                     }
                 }
             } else {
@@ -920,33 +930,36 @@ public class HerbalismManager extends SkillManager {
     }
 
     private boolean usesBackpacks = true;
-    private boolean condensedInventoryContains(Player player, Material material) {
-        if (usesBackpacks) {
-            try {
-                Class.forName("com.opblocks.skyblock.modifieditems.backpack.util.BackpackUtils");
-            } catch (Exception ex) {
-                usesBackpacks = false;
-                return false;
-            }
-        } else { return false; }
+    private boolean isBackpacksAvailable() {
+        if (!usesBackpacks) return false;
 
         try {
-            final Map<String, com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData> items = com.opblocks.skyblock.modifieditems.backpack.util.BackpackUtils.getBackpack(player).getItems();
-            final String key = material.name();
-            final int itemCount = Optional.ofNullable(items.get(key))
-                    .map(com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData::count)
-                    .orElse(0L)
-                    .intValue();
-
-            if (itemCount > 0) {
-                return true;
-            }
-            final CondenseData condenseData = OverflowAPI.condensedItems.getOrDefault(player.getUniqueId(), new CondenseData(player));
-
-            return condenseData.getItems().getOrDefault(key, 0) > 0;
+            Class.forName("com.opblocks.skyblock.modifieditems.backpack.util.BackpackUtils");
+            return true;
         } catch (Exception ex) {
+            usesBackpacks = false;
             return false;
         }
+    }
+
+    private boolean condensedInventoryContains(Player player, Material material) {
+        final String key = material.name();
+
+        // check backpack if available
+        if (isBackpacksAvailable()) {
+            try {
+                final Map<String, com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData> items = com.opblocks.skyblock.modifieditems.backpack.util.BackpackUtils.getBackpack(player).getItems();
+                final int itemCount = Optional.ofNullable(items.get(key))
+                        .map(com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData::count)
+                        .orElse(0L)
+                        .intValue();
+                if (itemCount > 0) return true;
+            } catch (Exception ex) { return false; }
+        }
+
+        // check OverflowAPI for condensed items
+        final CondenseData condenseData = OverflowAPI.condensedItems.getOrDefault(player.getUniqueId(), new CondenseData(player));
+        return condenseData.getItems().getOrDefault(key, 0) > 0;
     }
 
     private boolean processGrowingPlants(BlockState blockState, Ageable ageable, BlockBreakEvent blockBreakEvent, boolean greenTerra) {
