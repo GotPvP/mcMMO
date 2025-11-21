@@ -49,12 +49,10 @@ public final class ShareHandler {
 
         for (Player member : nearMembers) {
             //Profile not loaded
-            if(UserManager.getPlayer(member) == null)
-            {
-                continue;
-            }
+            final var user = UserManager.getPlayer(member);
+            if(user == null) continue;
 
-            UserManager.getPlayer(member).beginUnsharedXpGain(primarySkillType, splitXp, xpGainReason, XPGainSource.PARTY_MEMBERS);
+            user.beginUnsharedXpGain(primarySkillType, splitXp, xpGainReason, XPGainSource.PARTY_MEMBERS);
         }
 
         return true;
@@ -111,12 +109,7 @@ public final class ShareHandler {
 
                     for (Player member : nearMembers) {
                         McMMOPlayer mcMMOMember = UserManager.getPlayer(member);
-
-                        //Profile not loaded
-                        if(UserManager.getPlayer(member) == null)
-                        {
-                            continue;
-                        }
+                        if(mcMMOMember == null) continue;
 
                         int itemShareModifier = mcMMOMember.getItemShareModifier();
                         int diceRoll = Misc.getRandom().nextInt(itemShareModifier);
@@ -130,15 +123,18 @@ public final class ShareHandler {
 
                         if (winningPlayer != null) {
                             McMMOPlayer mcMMOWinning = UserManager.getPlayer(winningPlayer);
-                            mcMMOWinning.setItemShareModifier(mcMMOWinning.getItemShareModifier() + itemWeight);
+                            if (mcMMOWinning != null)
+                                mcMMOWinning.setItemShareModifier(mcMMOWinning.getItemShareModifier() + itemWeight);
                         }
 
                         winningPlayer = member;
                     }
 
                     McMMOPlayer mcMMOTarget = UserManager.getPlayer(winningPlayer);
+                    if (mcMMOTarget != null) {
                     mcMMOTarget.setItemShareModifier(mcMMOTarget.getItemShareModifier() - itemWeight);
                     awardDrop(winningPlayer, newStack);
+                    }
                 }
 
                 return true;

@@ -233,10 +233,13 @@ public final class EventUtils {
         boolean isCancelled = event.isCancelled();
 
         if (isCancelled) {
-            PlayerProfile profile = UserManager.getPlayer(player).getProfile();
+            final var user = UserManager.getPlayer(player);
 
-            profile.modifySkill(skill, profile.getSkillLevel(skill) - (isLevelUp ? levelsChanged : -levelsChanged));
-            profile.addXp(skill, xpRemoved);
+            if (user != null) {
+                PlayerProfile profile = user.getProfile();
+                profile.modifySkill(skill, profile.getSkillLevel(skill) - (isLevelUp ? levelsChanged : -levelsChanged));
+                profile.addXp(skill, xpRemoved);
+            }
         }
 
         return isCancelled;
@@ -269,10 +272,13 @@ public final class EventUtils {
         boolean isCancelled = event.isCancelled();
 
         if (isCancelled) {
-            PlayerProfile profile = UserManager.getPlayer(player).getProfile();
+            final var user = UserManager.getPlayer(player);
 
-            profile.modifySkill(skill, profile.getSkillLevel(skill) - (isLevelUp ? levelsChanged : -levelsChanged));
-            profile.addXp(skill, xpRemoved);
+            if (user != null) {
+                PlayerProfile profile = user.getProfile();
+                profile.modifySkill(skill, profile.getSkillLevel(skill) - (isLevelUp ? levelsChanged : -levelsChanged));
+                profile.addXp(skill, xpRemoved);
+            }
         }
 
         return isCancelled;
@@ -365,7 +371,8 @@ public final class EventUtils {
         teleportingPlayer.sendMessage(LocaleLoader.getString("Party.Teleport.Player", targetPlayer.getName()));
         targetPlayer.sendMessage(LocaleLoader.getString("Party.Teleport.Target", teleportingPlayer.getName()));
 
-        mcMMOPlayer.getPartyTeleportRecord().actualizeLastUse();
+        final var record = mcMMOPlayer.getPartyTeleportRecord();
+        if (record != null) record.actualizeLastUse();
     }
 
     public static boolean handlePartyXpGainEvent(Party party, float xpGained) {
@@ -414,8 +421,8 @@ public final class EventUtils {
     }
 
     public static boolean handleStatsLossEvent(Player player, HashMap<String, Integer> levelChanged, HashMap<String, Float> experienceChanged) {
-        if(UserManager.getPlayer(player) == null)
-            return true;
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return true;
 
         McMMOPlayerStatLossEvent event = new McMMOPlayerStatLossEvent(player, levelChanged, experienceChanged);
         mcMMO.p.getServer().getPluginManager().callEvent(event);
@@ -425,7 +432,7 @@ public final class EventUtils {
         if (!isCancelled) {
             levelChanged = event.getLevelChanged();
             experienceChanged = event.getExperienceChanged();
-            PlayerProfile playerProfile = UserManager.getPlayer(player).getProfile();
+            PlayerProfile playerProfile = user.getProfile();
 
             for (PrimarySkillType primarySkillType : SkillTools.NON_CHILD_SKILLS) {
                 String skillName = primarySkillType.toString();
@@ -465,16 +472,13 @@ public final class EventUtils {
             HashMap<String, Float> experienceChangedVictim = eventVictim.getExperienceChanged();
 
             McMMOPlayer killerPlayer = UserManager.getPlayer(killer);
+            if(killerPlayer == null) return true;
 
-            //Not loaded
-            if(killerPlayer == null)
-                return true;
+            // Not loaded
+            final var victimUser = UserManager.getPlayer(victim);
+            if(victimUser == null) return true;
 
-            //Not loaded
-            if(UserManager.getPlayer(victim) == null)
-                return true;
-
-            PlayerProfile victimProfile = UserManager.getPlayer(victim).getProfile();
+            PlayerProfile victimProfile = victimUser.getProfile();
 
             for (PrimarySkillType primarySkillType : SkillTools.NON_CHILD_SKILLS) {
                 String skillName = primarySkillType.toString();

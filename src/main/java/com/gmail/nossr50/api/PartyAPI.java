@@ -5,10 +5,8 @@ import com.gmail.nossr50.datatypes.party.Party;
 import com.gmail.nossr50.datatypes.party.PartyLeader;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.mcMMO;
-import com.gmail.nossr50.party.PartyManager;
 import com.gmail.nossr50.util.player.NotificationManager;
 import com.gmail.nossr50.util.player.UserManager;
-import jdk.jfr.Experimental;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -26,12 +24,16 @@ public final class PartyAPI {
      * @param player The player to check the party name of
      * @return the name of the player's party, or null if not in a party
      */
-    public static String getPartyName(Player player) {
+    public static @Nullable String getPartyName(Player player) {
         if (!mcMMO.p.getPartyConfig().isPartyEnabled() || !inParty(player)) {
             return null;
         }
 
-        return UserManager.getPlayer(player).getParty().getName();
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return null;
+        final var party = user.getParty();
+        if (party == null) return null;
+        return party.getName();
     }
 
     /**
@@ -52,10 +54,12 @@ public final class PartyAPI {
      * @return true if the player is in a party, false otherwise
      */
     public static boolean inParty(Player player) {
-        if(!mcMMO.p.getPartyConfig().isPartyEnabled() || UserManager.getPlayer(player) == null)
+        if(!mcMMO.p.getPartyConfig().isPartyEnabled())
             return false;
 
-        return UserManager.getPlayer(player).inParty();
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.inParty();
     }
 
     /**
@@ -142,8 +146,12 @@ public final class PartyAPI {
      */
     public static void addToParty(Player player, String partyName, boolean bypassLimit) {
         //Check if player profile is loaded
-        if(!mcMMO.p.getPartyConfig().isPartyEnabled() || UserManager.getPlayer(player) == null)
+        if(!mcMMO.p.getPartyConfig().isPartyEnabled())
             return;
+
+        // get user
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
 
         Party party = mcMMO.p.getPartyManager().getParty(partyName);
 
@@ -151,7 +159,7 @@ public final class PartyAPI {
             party = new Party(new PartyLeader(player.getUniqueId(), player.getName()), partyName);
         }
 
-        mcMMO.p.getPartyManager().addToParty(UserManager.getPlayer(player), party);
+        mcMMO.p.getPartyManager().addToParty(user, party);
     }
 
     /**
@@ -163,10 +171,13 @@ public final class PartyAPI {
      */
     public static void removeFromParty(Player player) {
         //Check if player profile is loaded
-        if(!mcMMO.p.getPartyConfig().isPartyEnabled() || UserManager.getPlayer(player) == null)
+        if(!mcMMO.p.getPartyConfig().isPartyEnabled())
             return;
 
-        mcMMO.p.getPartyManager().removeFromParty(UserManager.getPlayer(player));
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+
+        mcMMO.p.getPartyManager().removeFromParty(user);
     }
 
     /**
@@ -197,7 +208,10 @@ public final class PartyAPI {
         if(!mcMMO.p.getPartyConfig().isPartyEnabled())
             return;
 
-        mcMMO.p.getPartyManager().setPartyLeader(mcMMO.p.getServer().getOfflinePlayer(playerName).getUniqueId(), mcMMO.p.getPartyManager().getParty(partyName));
+        final var party = mcMMO.p.getPartyManager().getParty(partyName);
+        if (party == null) return;
+
+        mcMMO.p.getPartyManager().setPartyLeader(mcMMO.p.getServer().getOfflinePlayer(playerName).getUniqueId(), party);
     }
 
     /**
@@ -285,7 +299,10 @@ public final class PartyAPI {
     }
 
     public static String getAllyName(String partyName) {
-        Party ally = mcMMO.p.getPartyManager().getParty(partyName).getAlly();
+        final var party = mcMMO.p.getPartyManager().getParty(partyName);
+        if (party == null) return null;
+
+        Party ally = party.getAlly();
         if (ally != null) {
             return ally.getName();
         }

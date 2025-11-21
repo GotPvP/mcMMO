@@ -189,11 +189,11 @@ public class RankUtils {
         //Get our rank map
         HashMap<Integer, Integer> rankMap = subSkillRanks.get(skillName);
 
-        if(UserManager.getPlayer(player) == null)
-            return 0;
+        final var user = UserManager.getPlayer(player);
+        if(user == null) return 0;
 
         //Skill level of parent skill
-        int currentSkillLevel = UserManager.getPlayer(player).getSkillLevel(subSkillType.getParentSkill());
+        int currentSkillLevel = user.getSkillLevel(subSkillType.getParentSkill());
 
         for(int i = 0; i < numRanks; i++)
         {

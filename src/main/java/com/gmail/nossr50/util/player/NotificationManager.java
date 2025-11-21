@@ -45,8 +45,9 @@ public class NotificationManager {
      */
     public static void sendPlayerInformation(Player player, NotificationType notificationType, String key)
     {
-        if(UserManager.getPlayer(player) == null || !UserManager.getPlayer(player).useChatNotifications())
-            return;
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        if (!user.useChatNotifications()) return;
 
         McMMOMessageType destination
                 = mcMMO.p.getAdvancedConfig().doesNotificationUseActionBar(notificationType)
@@ -61,10 +62,9 @@ public class NotificationManager {
 
     public static boolean doesPlayerUseNotifications(Player player)
     {
-        if(UserManager.getPlayer(player) == null)
-            return false;
-        else
-            return UserManager.getPlayer(player).useChatNotifications();
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.useChatNotifications();
     }
 
     /**
@@ -82,30 +82,29 @@ public class NotificationManager {
         sendPlayerInformation(targetPlayer, notificationType, key, values);
     }
 
-    public static void sendPlayerInformationChatOnly(Player player, String key, String... values)
-    {
-        if(UserManager.getPlayer(player) == null || !UserManager.getPlayer(player).useChatNotifications())
-            return;
+    public static void sendPlayerInformationChatOnly(Player player, String key, String... values) {
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        if (!user.useChatNotifications()) return;
 
         String preColoredString = LocaleLoader.getString(key, (Object[]) values);
         player.sendMessage(preColoredString);
     }
 
-    public static void sendPlayerInformationChatOnlyPrefixed(Player player, String key, String... values)
-    {
-        if(UserManager.getPlayer(player) == null || !UserManager.getPlayer(player).useChatNotifications())
-            return;
+    public static void sendPlayerInformationChatOnlyPrefixed(Player player, String key, String... values) {
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        if (!user.useChatNotifications()) return;
 
         String preColoredString = LocaleLoader.getString(key, (Object[]) values);
         String prefixFormattedMessage = LocaleLoader.getString("mcMMO.Template.Prefix", preColoredString);
         player.sendMessage(prefixFormattedMessage);
     }
 
-    public static void sendPlayerInformation(Player player, NotificationType notificationType, String key,
-                                             String... values)
-    {
-        if(UserManager.getPlayer(player) == null || !UserManager.getPlayer(player).useChatNotifications())
-            return;
+    public static void sendPlayerInformation(Player player, NotificationType notificationType, String key, String... values) {
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        if (!user.useChatNotifications()) return;
 
         McMMOMessageType destination = mcMMO.p.getAdvancedConfig().doesNotificationUseActionBar(notificationType) ? McMMOMessageType.ACTION_BAR : McMMOMessageType.SYSTEM;
 

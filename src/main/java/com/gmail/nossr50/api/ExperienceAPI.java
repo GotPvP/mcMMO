@@ -18,6 +18,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -137,12 +138,15 @@ public final class ExperienceAPI {
      * @throws InvalidXPGainReasonException if the given xpGainReason is not valid
      */
     public static void addRawXP(Player player, String skillType, float XP, String xpGainReason, boolean isUnshared) {
+        final var user = getPlayer(player);
+        if (user == null) return;
+
         if (isUnshared) {
-            getPlayer(player).beginUnsharedXpGain(getSkillType(skillType), XP, getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
+            user.beginUnsharedXpGain(getSkillType(skillType), XP, getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
             return;
         }
 
-        getPlayer(player).applyXpGain(getSkillType(skillType), XP, getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
+        user.applyXpGain(getSkillType(skillType), XP, getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
     }
 
     /**
@@ -224,7 +228,9 @@ public final class ExperienceAPI {
      * @throws InvalidXPGainReasonException if the given xpGainReason is not valid
      */
     public static void addMultipliedXP(Player player, String skillType, int XP, String xpGainReason) {
-        getPlayer(player).applyXpGain(getSkillType(skillType), (int) (XP * ExperienceConfig.getInstance().getExperienceGainsGlobalMultiplier()), getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
+        final var user = getPlayer(player);
+        if (user == null) return;
+        user.applyXpGain(getSkillType(skillType), (int) (XP * ExperienceConfig.getInstance().getExperienceGainsGlobalMultiplier()), getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
     }
 
     /**
@@ -292,15 +298,17 @@ public final class ExperienceAPI {
      * @throws InvalidXPGainReasonException if the given xpGainReason is not valid
      */
     public static void addModifiedXP(Player player, String skillType, int XP, String xpGainReason, boolean isUnshared) {
+        final var user = getPlayer(player);
+        if (user == null) return;
         PrimarySkillType skill = getSkillType(skillType);
 
         if (isUnshared) {
-            getPlayer(player).beginUnsharedXpGain(skill,
+            user.beginUnsharedXpGain(skill,
                     (int) (XP / ExperienceConfig.getInstance().getFormulaSkillModifier(skill) * ExperienceConfig.getInstance().getExperienceGainsGlobalMultiplier()), getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
             return;
         }
 
-        getPlayer(player).applyXpGain(skill, (int) (XP / ExperienceConfig.getInstance().getFormulaSkillModifier(skill) * ExperienceConfig.getInstance().getExperienceGainsGlobalMultiplier()), getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
+        user.applyXpGain(skill, (int) (XP / ExperienceConfig.getInstance().getFormulaSkillModifier(skill) * ExperienceConfig.getInstance().getExperienceGainsGlobalMultiplier()), getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
     }
 
     /**
@@ -373,12 +381,15 @@ public final class ExperienceAPI {
      * @throws InvalidXPGainReasonException if the given xpGainReason is not valid
      */
     public static void addXP(Player player, String skillType, int XP, String xpGainReason, boolean isUnshared) {
+        final var user = getPlayer(player);
+        if (user == null) return;
+
         if (isUnshared) {
-            getPlayer(player).beginUnsharedXpGain(getSkillType(skillType), XP, getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
+            user.beginUnsharedXpGain(getSkillType(skillType), XP, getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
             return;
         }
 
-        getPlayer(player).beginXpGain(getSkillType(skillType), XP, getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
+        user.beginXpGain(getSkillType(skillType), XP, getXPGainReason(xpGainReason), XPGainSource.CUSTOM);
     }
 
     /**
@@ -394,7 +405,9 @@ public final class ExperienceAPI {
      * @throws UnsupportedOperationException if the given skill is a child skill
      */
     public static int getXP(Player player, String skillType) {
-        return getPlayer(player).getSkillXpLevel(getNonChildSkillType(skillType));
+        final var user = getPlayer(player);
+        if (user == null) return 0;
+        return user.getSkillXpLevel(getNonChildSkillType(skillType));
     }
 
     /**
@@ -462,7 +475,9 @@ public final class ExperienceAPI {
      * @throws UnsupportedOperationException if the given skill is a child skill
      */
     public static float getXPRaw(Player player, String skillType) {
-        return getPlayer(player).getSkillXpLevelRaw(getNonChildSkillType(skillType));
+        final var user = getPlayer(player);
+        if (user == null) return 0;
+        return user.getSkillXpLevelRaw(getNonChildSkillType(skillType));
     }
 
     /**
@@ -537,7 +552,9 @@ public final class ExperienceAPI {
      * @throws UnsupportedOperationException if the given skill is a child skill
      */
     public static int getXPToNextLevel(Player player, String skillType) {
-        return getPlayer(player).getXpToLevel(getNonChildSkillType(skillType));
+        final var user = getPlayer(player);
+        if (user == null) return 0;
+        return user.getXpToLevel(getNonChildSkillType(skillType));
     }
 
     /**
@@ -605,9 +622,11 @@ public final class ExperienceAPI {
      * @throws UnsupportedOperationException if the given skill is a child skill
      */
     public static int getXPRemaining(Player player, String skillType) {
+        final var user = getPlayer(player);
+        if (user == null) return 0;
         PrimarySkillType skill = getNonChildSkillType(skillType);
 
-        PlayerProfile profile = getPlayer(player).getProfile();
+        PlayerProfile profile = user.getProfile();
 
         return profile.getXpToLevel(skill) - profile.getSkillXpLevel(skill);
     }
@@ -685,7 +704,9 @@ public final class ExperienceAPI {
      * @throws InvalidSkillException if the given skill is not valid
      */
     public static void addLevel(Player player, String skillType, int levels) {
-        getPlayer(player).addLevels(getSkillType(skillType), levels);
+        final var user = getPlayer(player);
+        if (user == null) return;
+        user.addLevels(getSkillType(skillType), levels);
     }
 
     /**
@@ -765,7 +786,9 @@ public final class ExperienceAPI {
      */
     @Deprecated
     public static int getLevel(Player player, String skillType) {
-        return getPlayer(player).getSkillLevel(getSkillType(skillType));
+        final var user = getPlayer(player);
+        if (user == null) return 0;
+        return user.getSkillLevel(getSkillType(skillType));
     }
 
     /**
@@ -780,7 +803,9 @@ public final class ExperienceAPI {
      * @throws InvalidSkillException if the given skill is not valid
      */
     public static int getLevel(Player player, PrimarySkillType skillType) {
-        return getPlayer(player).getSkillLevel(skillType);
+        final var user = getPlayer(player);
+        if (user == null) return 0;
+        return user.getSkillLevel(skillType);
     }
 
     /**
@@ -824,7 +849,9 @@ public final class ExperienceAPI {
      * @return the power level of the player
      */
     public static int getPowerLevel(Player player) {
-        return getPlayer(player).getPowerLevel();
+        final var user = getPlayer(player);
+        if (user == null) return 0;
+        return user.getPowerLevel();
     }
 
     /**
@@ -975,7 +1002,9 @@ public final class ExperienceAPI {
      * @throws InvalidSkillException if the given skill is not valid
      */
     public static void setLevel(Player player, String skillType, int skillLevel) {
-        getPlayer(player).modifySkill(getSkillType(skillType), skillLevel);
+        final var user = getPlayer(player);
+        if (user == null) return;
+        user.modifySkill(getSkillType(skillType), skillLevel);
     }
 
     /**
@@ -1024,7 +1053,9 @@ public final class ExperienceAPI {
      * @throws UnsupportedOperationException if the given skill is a child skill
      */
     public static void setXP(Player player, String skillType, int newValue) {
-        getPlayer(player).setSkillXpLevel(getNonChildSkillType(skillType), newValue);
+        final var user = getPlayer(player);
+        if (user == null) return;
+        user.setSkillXpLevel(getNonChildSkillType(skillType), newValue);
     }
 
     /**
@@ -1075,7 +1106,9 @@ public final class ExperienceAPI {
      * @throws UnsupportedOperationException if the given skill is a child skill
      */
     public static void removeXP(Player player, String skillType, int xp) {
-        getPlayer(player).removeXp(getNonChildSkillType(skillType), xp);
+        final var user = getPlayer(player);
+        if (user == null) return;
+        user.removeXp(getNonChildSkillType(skillType), xp);
     }
 
     /**
@@ -1298,7 +1331,7 @@ public final class ExperienceAPI {
      * @throws McMMOPlayerNotFoundException
      */
     @Deprecated
-    private static McMMOPlayer getPlayer(Player player) throws McMMOPlayerNotFoundException {
+    private static @Nullable McMMOPlayer getPlayer(Player player) throws McMMOPlayerNotFoundException {
         if (!UserManager.hasPlayerDataKey(player)) {
             throw new McMMOPlayerNotFoundException(player);
         }

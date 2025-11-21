@@ -11,35 +11,50 @@ public final class AbilityAPI {
     private AbilityAPI() {}
 
     public static boolean berserkEnabled(Player player) {
-        return UserManager.getPlayer(player).getAbilityMode(SuperAbilityType.BERSERK);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.getAbilityMode(SuperAbilityType.BERSERK);
     }
 
     public static boolean gigaDrillBreakerEnabled(Player player) {
-        return UserManager.getPlayer(player).getAbilityMode(SuperAbilityType.GIGA_DRILL_BREAKER);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.getAbilityMode(SuperAbilityType.GIGA_DRILL_BREAKER);
     }
 
     public static boolean greenTerraEnabled(Player player) {
-        return UserManager.getPlayer(player).getAbilityMode(SuperAbilityType.GREEN_TERRA);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.getAbilityMode(SuperAbilityType.GREEN_TERRA);
     }
 
     public static boolean serratedStrikesEnabled(Player player) {
-        return UserManager.getPlayer(player).getAbilityMode(SuperAbilityType.SERRATED_STRIKES);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.getAbilityMode(SuperAbilityType.SERRATED_STRIKES);
     }
 
     public static boolean skullSplitterEnabled(Player player) {
-        return UserManager.getPlayer(player).getAbilityMode(SuperAbilityType.SKULL_SPLITTER);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.getAbilityMode(SuperAbilityType.SKULL_SPLITTER);
     }
 
     public static boolean superBreakerEnabled(Player player) {
-        return UserManager.getPlayer(player).getAbilityMode(SuperAbilityType.SUPER_BREAKER);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.getAbilityMode(SuperAbilityType.SUPER_BREAKER);
     }
 
     public static boolean treeFellerEnabled(Player player) {
-        return UserManager.getPlayer(player).getAbilityMode(SuperAbilityType.TREE_FELLER);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.getAbilityMode(SuperAbilityType.TREE_FELLER);
     }
 
     public static boolean isAnyAbilityEnabled(Player player) {
         McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
+        if (mcMMOPlayer == null) return false;
 
         for (SuperAbilityType ability : SuperAbilityType.values()) {
             if (mcMMOPlayer.getAbilityMode(ability)) {
@@ -51,44 +66,56 @@ public final class AbilityAPI {
     }
 
     public static void resetCooldowns(Player player) {
-        UserManager.getPlayer(player).resetCooldowns();
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        user.resetCooldowns();
     }
 
     public static void setBerserkCooldown(Player player, long cooldown) {
-        UserManager.getPlayer(player).setAbilityDATS(SuperAbilityType.BERSERK, cooldown);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        user.setAbilityDATS(SuperAbilityType.BERSERK, cooldown);
     }
 
     public static void setGigaDrillBreakerCooldown(Player player, long cooldown) {
-        UserManager.getPlayer(player).setAbilityDATS(SuperAbilityType.GIGA_DRILL_BREAKER, cooldown);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        user.setAbilityDATS(SuperAbilityType.GIGA_DRILL_BREAKER, cooldown);
     }
 
     public static void setGreenTerraCooldown(Player player, long cooldown) {
-        UserManager.getPlayer(player).setAbilityDATS(SuperAbilityType.GREEN_TERRA, cooldown);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        user.setAbilityDATS(SuperAbilityType.GREEN_TERRA, cooldown);
     }
 
     public static void setSerratedStrikesCooldown(Player player, long cooldown) {
-        UserManager.getPlayer(player).setAbilityDATS(SuperAbilityType.SERRATED_STRIKES, cooldown);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        user.setAbilityDATS(SuperAbilityType.SERRATED_STRIKES, cooldown);
     }
 
     public static void setSkullSplitterCooldown(Player player, long cooldown) {
-        UserManager.getPlayer(player).setAbilityDATS(SuperAbilityType.SKULL_SPLITTER, cooldown);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        user.setAbilityDATS(SuperAbilityType.SKULL_SPLITTER, cooldown);
     }
 
     public static void setSuperBreakerCooldown(Player player, long cooldown) {
-        UserManager.getPlayer(player).setAbilityDATS(SuperAbilityType.SUPER_BREAKER, cooldown);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        user.setAbilityDATS(SuperAbilityType.SUPER_BREAKER, cooldown);
     }
 
     public static void setTreeFellerCooldown(Player player, long cooldown) {
-        UserManager.getPlayer(player).setAbilityDATS(SuperAbilityType.TREE_FELLER, cooldown);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        user.setAbilityDATS(SuperAbilityType.TREE_FELLER, cooldown);
     }
 
     public static boolean isBleeding(LivingEntity entity) {
-        if(entity.isValid()) {
-            if(entity.hasMetadata(MetadataConstants.METADATA_KEY_RUPTURE)) {
-                return true;
-            }
-        }
-
+        if (entity.isValid())
+            return entity.hasMetadata(MetadataConstants.METADATA_KEY_RUPTURE);
         return false;
     }
 }

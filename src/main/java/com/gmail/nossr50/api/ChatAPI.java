@@ -71,7 +71,9 @@ public final class ChatAPI {
      * @return true if the player is using party chat, false otherwise
      */
     public static boolean isUsingPartyChat(Player player) {
-        return UserManager.getPlayer(player).getChatChannel() == ChatChannel.PARTY;
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.getChatChannel() == ChatChannel.PARTY;
     }
 
     /**
@@ -81,7 +83,9 @@ public final class ChatAPI {
      * @return true if the player is using party chat, false otherwise
      */
     public static boolean isUsingPartyChat(String playerName) {
-        return UserManager.getPlayer(playerName).getChatChannel() == ChatChannel.PARTY;
+        final var user = UserManager.getPlayer(playerName);
+        if (user == null) return false;
+        return user.getChatChannel() == ChatChannel.PARTY;
     }
 
     /**
@@ -91,7 +95,9 @@ public final class ChatAPI {
      * @return true if the player is using admin chat, false otherwise
      */
     public static boolean isUsingAdminChat(Player player) {
-        return UserManager.getPlayer(player).getChatChannel() == ChatChannel.ADMIN;
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return false;
+        return user.getChatChannel() == ChatChannel.ADMIN;
     }
 
     /**
@@ -101,7 +107,9 @@ public final class ChatAPI {
      * @return true if the player is using admin chat, false otherwise
      */
     public static boolean isUsingAdminChat(String playerName) {
-        return UserManager.getPlayer(playerName).getChatChannel() == ChatChannel.ADMIN;
+        final var user = UserManager.getPlayer(playerName);
+        if (user == null) return false;
+        return user.getChatChannel() == ChatChannel.ADMIN;
     }
 
     /**
@@ -110,7 +118,9 @@ public final class ChatAPI {
      * @param player The player to toggle party chat on.
      */
     public static void togglePartyChat(Player player) {
-        mcMMO.p.getChatManager().setOrToggleChatChannel(UserManager.getPlayer(player), ChatChannel.PARTY);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        mcMMO.p.getChatManager().setOrToggleChatChannel(user, ChatChannel.PARTY);
     }
 
     /**
@@ -119,7 +129,9 @@ public final class ChatAPI {
      * @param playerName The name of the player to toggle party chat on.
      */
     public static void togglePartyChat(String playerName) {
-        mcMMO.p.getChatManager().setOrToggleChatChannel(UserManager.getPlayer(playerName), ChatChannel.PARTY);
+        final var user = UserManager.getPlayer(playerName);
+        if (user == null) return;
+        mcMMO.p.getChatManager().setOrToggleChatChannel(user, ChatChannel.PARTY);
     }
 
     /**
@@ -128,7 +140,9 @@ public final class ChatAPI {
      * @param player The player to toggle admin chat on.
      */
     public static void toggleAdminChat(Player player) {
-        mcMMO.p.getChatManager().setOrToggleChatChannel(UserManager.getPlayer(player), ChatChannel.ADMIN);
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
+        mcMMO.p.getChatManager().setOrToggleChatChannel(user, ChatChannel.ADMIN);
     }
 
     /**
@@ -137,6 +151,8 @@ public final class ChatAPI {
      * @param playerName The name of the player to toggle party chat on.
      */
     public static void toggleAdminChat(String playerName) {
-        mcMMO.p.getChatManager().setOrToggleChatChannel(UserManager.getPlayer(playerName), ChatChannel.ADMIN);
+        final var user = UserManager.getPlayer(playerName);
+        if (user == null) return;
+        mcMMO.p.getChatManager().setOrToggleChatChannel(user, ChatChannel.ADMIN);
     }
 }

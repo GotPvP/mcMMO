@@ -286,6 +286,7 @@ public class ScoreboardManager {
 
     public static void enablePlayerSkillScoreboard(Player player, PrimarySkillType skill) {
         McMMOPlayer mmoPlayer = UserManager.getPlayer(player);
+        if (mmoPlayer == null) return;
         mmoPlayer.setLastSkillShownScoreboard(skill);
 
         ScoreboardWrapper wrapper = getWrapper(player);
@@ -305,6 +306,7 @@ public class ScoreboardManager {
 
     public static void retryLastSkillBoard(Player player) {
         McMMOPlayer mmoPlayer = UserManager.getPlayer(player);
+        if (mmoPlayer == null) return;
         PrimarySkillType primarySkillType = mmoPlayer.getLastSkillShownScoreboard();
 
         ScoreboardWrapper wrapper = getWrapper(player);

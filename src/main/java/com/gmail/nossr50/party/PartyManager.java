@@ -64,22 +64,15 @@ public final class PartyManager {
         requireNonNull(firstPlayer, "firstPlayer cannot be null!");
         requireNonNull(secondPlayer, "secondPlayer cannot be null!");
 
-        //Profile not loaded
-        if (UserManager.getPlayer(firstPlayer) == null) {
-            return false;
-        }
+        final var firstUser = UserManager.getPlayer(firstPlayer);
+        final var secondUser = UserManager.getPlayer(secondPlayer);
+        if (firstUser == null || secondUser == null) return false;
 
-        //Profile not loaded
-        if (UserManager.getPlayer(secondPlayer) == null) {
-            return false;
-        }
+        Party firstParty = firstUser.getParty();
+        Party secondParty = secondUser.getParty();
 
-        Party firstParty = UserManager.getPlayer(firstPlayer).getParty();
-        Party secondParty = UserManager.getPlayer(secondPlayer).getParty();
-
-        if (firstParty == null || secondParty == null || firstParty.getAlly() == null || secondParty.getAlly() == null) {
+        if (firstParty == null || secondParty == null || firstParty.getAlly() == null || secondParty.getAlly() == null)
             return false;
-        }
 
         return firstParty.equals(secondParty.getAlly()) && secondParty.equals(firstParty.getAlly());
     }
@@ -327,11 +320,9 @@ public final class PartyManager {
         //TODO: Potential issues with unloaded profile?
         for (final Player member : party.getOnlineMembers()) {
             //Profile not loaded
-            if (UserManager.getPlayer(member) == null) {
-                continue;
-            }
-
-            processPartyLeaving(UserManager.getPlayer(member));
+            final var user = UserManager.getPlayer(member);
+            if (user == null) continue;
+            processPartyLeaving(user);
         }
 
         // Disband the alliance between the disbanded party and it's ally
@@ -439,6 +430,8 @@ public final class PartyManager {
         requireNonNull(mcMMOPlayer, "mcMMOPlayer cannot be null!");
         Party invite = mcMMOPlayer.getPartyAllianceInvite();
         Player player = mcMMOPlayer.getPlayer();
+        final var party = mcMMOPlayer.getParty();
+        if (party == null) return;
 
         // Check if the party still exists, it might have been disbanded
         if (!parties.contains(invite)) {
@@ -446,7 +439,7 @@ public final class PartyManager {
             return;
         }
 
-        if (!handlePartyChangeAllianceEvent(player, mcMMOPlayer.getParty().getName(), invite.getName(), McMMOPartyAllianceChangeEvent.EventReason.FORMED_ALLIANCE)) {
+        if (!handlePartyChangeAllianceEvent(player, party.getName(), invite.getName(), McMMOPartyAllianceChangeEvent.EventReason.FORMED_ALLIANCE)) {
             return;
         }
 
@@ -567,7 +560,7 @@ public final class PartyManager {
     public boolean canInvite(@NotNull McMMOPlayer mcMMOPlayer) {
         requireNonNull(mcMMOPlayer, "mcMMOPlayer cannot be null!");
         Party party = mcMMOPlayer.getParty();
-
+        if (party == null) return false;
         return !party.isLocked() || party.getLeader().getUniqueId().equals(mcMMOPlayer.getPlayer().getUniqueId());
     }
 
@@ -606,7 +599,7 @@ public final class PartyManager {
         if (mmoPlayer.inParty()) {
             final Party oldParty = mmoPlayer.getParty();
 
-            if (!handlePartyChangeEvent(player, oldParty.getName(), newPartyName, EventReason.CHANGED_PARTIES)) {
+            if (oldParty != null && !handlePartyChangeEvent(player, oldParty.getName(), newPartyName, EventReason.CHANGED_PARTIES)) {
                 return false;
             }
 
@@ -627,22 +620,13 @@ public final class PartyManager {
         requireNonNull(firstPlayer, "firstPlayer cannot be null!");
         requireNonNull(secondPlayer, "secondPlayer cannot be null!");
 
-        //Profile not loaded
-        if (UserManager.getPlayer(firstPlayer) == null) {
-            return false;
-        }
+        final var firstUser = UserManager.getPlayer(firstPlayer);
+        final var secondUser = UserManager.getPlayer(secondPlayer);
+        if (firstUser == null || secondUser == null) return false;
 
-        //Profile not loaded
-        if (UserManager.getPlayer(secondPlayer) == null) {
-            return false;
-        }
-
-        Party firstParty = UserManager.getPlayer(firstPlayer).getParty();
-        Party secondParty = UserManager.getPlayer(secondPlayer).getParty();
-
-        if (firstParty == null || secondParty == null) {
-            return false;
-        }
+        Party firstParty = firstUser.getParty();
+        Party secondParty = secondUser.getParty();
+        if (firstParty == null || secondParty == null) return false;
 
         return firstParty.equals(secondParty);
     }

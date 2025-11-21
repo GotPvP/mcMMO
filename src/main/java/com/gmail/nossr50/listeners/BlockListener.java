@@ -1,6 +1,5 @@
 package com.gmail.nossr50.listeners;
 
-import com.gmail.nossr50.api.ItemSpawnReason;
 import com.gmail.nossr50.config.HiddenConfig;
 import com.gmail.nossr50.config.WorldBlacklist;
 import com.gmail.nossr50.config.experience.ExperienceConfig;
@@ -27,7 +26,6 @@ import com.gmail.nossr50.util.sounds.SoundManager;
 import com.gmail.nossr50.util.sounds.SoundType;
 import com.gmail.nossr50.worldguard.WorldGuardManager;
 import com.gmail.nossr50.worldguard.WorldGuardUtils;
-import com.opblocks.overflowbackpacks.OverflowAPI;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.Item;
@@ -480,16 +478,14 @@ public class BlockListener implements Listener {
         }
 
         //Profile not loaded
-        if(UserManager.getPlayer(player) == null)
-        {
-            return;
-        }
+        final var user = UserManager.getPlayer(player);
+        if(user == null) return;
 
         BlockState blockState = event.getBlock().getState();
         ItemStack heldItem = player.getInventory().getItemInMainHand();
 
         if (ItemUtils.isSword(heldItem)) {
-            HerbalismManager herbalismManager = UserManager.getPlayer(player).getHerbalismManager();
+            HerbalismManager herbalismManager = user.getHerbalismManager();
 
             if (herbalismManager.canUseHylianLuck()) {
                 if (herbalismManager.processHylianLuck(blockState)) {
@@ -503,16 +499,6 @@ public class BlockListener implements Listener {
                 }
             }
         }
-        /*else if (!heldItem.containsEnchantment(Enchantment.SILK_TOUCH)) {
-            SmeltingManager smeltingManager = UserManager.getPlayer(player).getSmeltingManager();
-
-            if (smeltingManager.canUseFluxMining(blockState)) {
-                if (smeltingManager.processFluxMining(blockState)) {
-                    blockState.update(true);
-                    event.setCancelled(true);
-                }
-            }
-        }*/
     }
 
     /**
@@ -632,10 +618,7 @@ public class BlockListener implements Listener {
         McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
 
         //Profile not loaded
-        if(UserManager.getPlayer(player) == null)
-        {
-            return;
-        }
+        if(mcMMOPlayer == null) return;
 
         ItemStack heldItem = player.getInventory().getItemInMainHand();
         Block block = event.getBlock();
@@ -697,19 +680,17 @@ public class BlockListener implements Listener {
     //TODO: Convert into locale strings
     private void debugStickDump(Player player, BlockState blockState) {
         //Profile not loaded
-        if(UserManager.getPlayer(player) == null)
-        {
-            return;
-        }
+        final var user = UserManager.getPlayer(player);
+        if(user == null) return;
 
-        if(UserManager.getPlayer(player).isDebugMode())
+        if(user.isDebugMode())
         {
             if(mcMMO.getPlaceStore().isTrue(blockState))
                 player.sendMessage("[mcMMO DEBUG] This block is not natural and does not reward treasures/XP");
             else
             {
                 player.sendMessage("[mcMMO DEBUG] This block is considered natural by mcMMO");
-                UserManager.getPlayer(player).getExcavationManager().printExcavationDebug(player, blockState);
+                user.getExcavationManager().printExcavationDebug(player, blockState);
             }
 
             if(WorldGuardUtils.isWorldGuardLoaded())

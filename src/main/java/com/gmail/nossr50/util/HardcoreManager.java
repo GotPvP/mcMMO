@@ -26,10 +26,10 @@ public final class HardcoreManager {
         double statLossPercentage = mcMMO.p.getGeneralConfig().getHardcoreDeathStatPenaltyPercentage();
         int levelThreshold = mcMMO.p.getGeneralConfig().getHardcoreDeathStatPenaltyLevelThreshold();
 
-        if(UserManager.getPlayer(player) == null)
-            return;
+        final var user = UserManager.getPlayer(player);
+        if (user == null) return;
 
-        PlayerProfile playerProfile = UserManager.getPlayer(player).getProfile();
+        PlayerProfile playerProfile = user.getProfile();
         int totalLevelsLost = 0;
 
         HashMap<String, Integer> levelChanged = new HashMap<>();
@@ -77,11 +77,13 @@ public final class HardcoreManager {
         double vampirismStatLeechPercentage = mcMMO.p.getGeneralConfig().getHardcoreVampirismStatLeechPercentage();
         int levelThreshold = mcMMO.p.getGeneralConfig().getHardcoreVampirismLevelThreshold();
 
-        if(UserManager.getPlayer(killer) == null || UserManager.getPlayer(victim) == null)
+        final var victimUser = UserManager.getPlayer(victim);
+        final var killerUser = UserManager.getPlayer(killer);
+        if(killerUser == null || victimUser == null)
             return;
 
-        PlayerProfile killerProfile = UserManager.getPlayer(killer).getProfile();
-        PlayerProfile victimProfile = UserManager.getPlayer(victim).getProfile();
+        PlayerProfile killerProfile = killerUser.getProfile();
+        PlayerProfile victimProfile = victimUser.getProfile();
         int totalLevelsStolen = 0;
 
         HashMap<String, Integer> levelChanged = new HashMap<>();
