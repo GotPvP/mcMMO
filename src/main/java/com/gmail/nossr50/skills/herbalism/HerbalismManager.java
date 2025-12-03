@@ -37,6 +37,8 @@ import com.gmail.nossr50.util.sounds.SoundType;
 import com.gmail.nossr50.util.text.StringUtils;
 import com.opblocks.overflowbackpacks.CondenseData;
 import com.opblocks.overflowbackpacks.OverflowAPI;
+import com.opblocks.skyblock.modifieditems.backpack.Backpack;
+import com.opblocks.skyblock.modifieditems.backpack.util.BackpackUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -899,11 +901,11 @@ public class HerbalismManager extends SkillManager {
                 } else {
                     var complete = false;
                     if (isBackpacksAvailable()) {
-                        final Map<String, com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData> items = com.opblocks.skyblock.modifieditems.backpack.util.BackpackUtils.getBackpack(player).getItems();
-                        final com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData item = items.get(key);
+                        final Map<String, Backpack.BackpackItemData> items = BackpackUtils.getBackpack(player).getItems();
+                        final Backpack.BackpackItemData item = items.get(key);
 
                         if (item != null && item.count() > 0) {
-                            items.put(key, new com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData(
+                            items.put(key, new Backpack.BackpackItemData(
                                     Instant.now(),
                                     item.count() - 1
                             ));
@@ -925,7 +927,6 @@ public class HerbalismManager extends SkillManager {
             SoundManager.sendSound(player, player.getLocation(), SoundType.ITEM_CONSUMED);
             return true;
         }
-
 //        new HerbalismBlockUpdaterTask(blockState).runTaskLater(mcMMO.p, 0);
     }
 
@@ -948,9 +949,9 @@ public class HerbalismManager extends SkillManager {
         // check backpack if available
         if (isBackpacksAvailable()) {
             try {
-                final Map<String, com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData> items = com.opblocks.skyblock.modifieditems.backpack.util.BackpackUtils.getBackpack(player).getItems();
+                final Map<String, Backpack.BackpackItemData> items = BackpackUtils.getBackpack(player).getItems();
                 final int itemCount = Optional.ofNullable(items.get(key))
-                        .map(com.opblocks.skyblock.modifieditems.backpack.Backpack.BackpackItemData::count)
+                        .map(Backpack.BackpackItemData::count)
                         .orElse(0L)
                         .intValue();
                 if (itemCount > 0) return true;

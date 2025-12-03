@@ -297,7 +297,7 @@ public class ExperienceConfig extends BukkitConfig {
 
     /* Combat XP Multipliers */
     public double getCombatXP(EntityType entity) {
-        return config.getDouble("Experience_Values.Combat.Multiplier." + StringUtils.getPrettyEntityTypeString(entity).replace(" ", "_"));
+        return config.getDouble("Experience_Values.Combat.Multiplier." + StringUtils.getPrettyEntityTypeString(entity).replace(" ", "_"), 1.0);
     }
 
     public double getAnimalsXP(EntityType entity) {
