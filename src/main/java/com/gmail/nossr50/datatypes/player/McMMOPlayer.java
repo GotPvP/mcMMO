@@ -965,12 +965,10 @@ public class McMMOPlayer implements Identified {
         }
 
         McMMOPlayerAbilityActivateEvent event = EventUtils.callPlayerAbilityActivateEvent(player, primarySkillType, ticks);
+        if (event.isCancelled()) return;
 
-        if (event.isCancelled()) {
-            return;
-        }
-
-        ticks += event.getBoostedTicks();
+        ticks *= 20; // convert from seconds to ticks
+        ticks += (int) event.getBoostedTicks();
 
         if (useChatNotifications()) {
             NotificationManager.sendPlayerInformation(player, NotificationType.SUPER_ABILITY, superAbilityType.getAbilityOn());
@@ -989,7 +987,7 @@ public class McMMOPlayer implements Identified {
             SkillUtils.removeAbilityBuff(player.getInventory().getItemInMainHand());
 
         // Enable the ability
-        profile.setAbilityDATS(superAbilityType, System.currentTimeMillis() + ((long) ticks * Misc.TIME_CONVERSION_FACTOR));
+        profile.setAbilityDATS(superAbilityType, System.currentTimeMillis() + ((long) ticks * 50));
         setAbilityMode(superAbilityType, true);
 
         if (superAbilityType == SuperAbilityType.SUPER_BREAKER || superAbilityType == SuperAbilityType.GIGA_DRILL_BREAKER) {
@@ -997,7 +995,7 @@ public class McMMOPlayer implements Identified {
         }
 
         setToolPreparationMode(tool, false);
-        mcMMO.p.getFoliaLib().getImpl().runAtEntityLater(player, new AbilityDisableTask(this, superAbilityType), (long) ticks * Misc.TICK_CONVERSION_FACTOR);
+        mcMMO.p.getFoliaLib().getImpl().runAtEntityLater(player, new AbilityDisableTask(this, superAbilityType), ticks);
     }
 
     public void processAbilityActivation(@NotNull PrimarySkillType primarySkillType) {
@@ -1016,51 +1014,52 @@ public class McMMOPlayer implements Identified {
         }
 
         if (!getAbilityUse()) {
+            System.out.println("Failed get ability use check");
             return;
-        }
-
-        for (SuperAbilityType superAbilityType : SuperAbilityType.values()) {
-            if (getAbilityMode(superAbilityType)) {
-                return;
-            }
         }
 
         SuperAbilityType ability = mcMMO.p.getSkillTools().getSuperAbility(primarySkillType);
         ToolType tool = mcMMO.p.getSkillTools().getPrimarySkillToolType(primarySkillType);
+        if (!tool.inHand(inHand) || getToolPreparationMode(tool)) return;
+
+        for (SuperAbilityType superAbilityType : SuperAbilityType.values()) {
+            if (getAbilityMode(superAbilityType)) {
+                NotificationManager.sendPlayerInformation(player, NotificationType.SUPER_ABILITY, "Ability.Generic.AlreadyActive");
+                return;
+            }
+        }
 
         /*
          * Woodcutting & Axes need to be treated differently.
          * Basically the tool always needs to ready and we check to see if the cooldown is over when the user takes action
          */
-        if (tool.inHand(inHand) && !getToolPreparationMode(tool)) {
-            if (primarySkillType != PrimarySkillType.WOODCUTTING && primarySkillType != PrimarySkillType.AXES) {
-                int timeRemaining = calculateTimeRemaining(ability);
+        if (primarySkillType != PrimarySkillType.WOODCUTTING && primarySkillType != PrimarySkillType.AXES) {
+            int timeRemaining = calculateTimeRemaining(ability);
 
-                if (isAbilityOnCooldown(ability)) {
-                    NotificationManager.sendPlayerInformation(player, NotificationType.ABILITY_COOLDOWN, "Skills.TooTired", String.valueOf(timeRemaining));
-                    return;
-                }
+            if (isAbilityOnCooldown(ability)) {
+                NotificationManager.sendPlayerInformation(player, NotificationType.ABILITY_COOLDOWN, "Skills.TooTired", String.valueOf(timeRemaining));
+                return;
             }
-
-            if (mcMMO.p.getGeneralConfig().getAbilityMessagesEnabled()) {
-                /*
-                 *
-                 * IF THE TOOL IS AN AXE
-                 *
-                 */
-                if(tool == ToolType.AXE) {
-                    processAxeToolMessages();
-                } else {
-                    NotificationManager.sendPlayerInformation(player, NotificationType.TOOL, tool.getRaiseTool());
-                }
-
-                //Send Sound
-                SoundManager.sendSound(player, player.getLocation(), SoundType.TOOL_READY);
-            }
-
-            setToolPreparationMode(tool, true);
-            mcMMO.p.getFoliaLib().getImpl().runAtEntityLater(player, new ToolLowerTask(this, tool), 4 * Misc.TICK_CONVERSION_FACTOR);
         }
+
+        if (mcMMO.p.getGeneralConfig().getAbilityMessagesEnabled()) {
+            /*
+             *
+             * IF THE TOOL IS AN AXE
+             *
+             */
+            if(tool == ToolType.AXE) {
+                processAxeToolMessages();
+            } else {
+                NotificationManager.sendPlayerInformation(player, NotificationType.TOOL, tool.getRaiseTool());
+            }
+
+            //Send Sound
+            SoundManager.sendSound(player, player.getLocation(), SoundType.TOOL_READY);
+        }
+
+        setToolPreparationMode(tool, true);
+        mcMMO.p.getFoliaLib().getImpl().runAtEntityLater(player, new ToolLowerTask(this, tool), 4 * Misc.TICK_CONVERSION_FACTOR);
     }
 
     public void processAxeToolMessages() {

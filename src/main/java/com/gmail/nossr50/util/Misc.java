@@ -158,10 +158,7 @@ public final class Misc {
         // We can't get the item until we spawn it and we want to make it cancellable, so we have a custom event.
         McMMOItemSpawnEvent event = new McMMOItemSpawnEvent(location, itemStack, itemSpawnReason, player);
         mcMMO.p.getServer().getPluginManager().callEvent(event);
-
-        if (event.isCancelled()) {
-            return null;
-        }
+        if (event.isCancelled()) return null;
 
         return location.getWorld().dropItem(location, itemStack);
     }

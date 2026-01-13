@@ -267,9 +267,7 @@ public class WoodcuttingManager extends SkillManager {
      * @param treeFellerBlocks List of blocks to be dropped
      */
     private void dropTreeFellerLootFromBlocks(@NotNull Set<BlockState> treeFellerBlocks) {
-        if (treeFellerBlocks.isEmpty()) {
-            return;
-        }
+        if (treeFellerBlocks.isEmpty()) return;
 
         Map<Material, Integer> blocks = new HashMap<>();
         Map<Material, Collection<ItemStack>> blockDrops = new HashMap<>();
@@ -282,9 +280,8 @@ public class WoodcuttingManager extends SkillManager {
         for (BlockState blockState : treeFellerBlocks) {
             Block block = blockState.getBlock();
 
-            if (!lenient && !EventUtils.simulateBlockBreak(block, player, FakeBlockBreakEventType.TREE_FELLER)) {
-                continue;
-            }
+            final var simBreak = EventUtils.simulateBlockBreak(block, player, FakeBlockBreakEventType.TREE_FELLER);
+            if (!lenient && !simBreak) continue;
 
             Material type = block.getType();
             blocks.put(type, blocks.getOrDefault(type, 0) + 1);
