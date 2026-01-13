@@ -426,6 +426,7 @@ public class BlockListener implements Listener {
             if (woodcuttingManager.canUseTreeFeller(heldItem)) {
                 block.setMetadata("nofeetdrop", new FixedMetadataValue(plugin, (byte) 0));
                 woodcuttingManager.processTreeFeller(blockState);
+                event.setDropItems(false);
             }
             else {
                 //Check for XP
