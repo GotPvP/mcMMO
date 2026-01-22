@@ -281,8 +281,9 @@ public class WoodcuttingManager extends SkillManager {
         for (BlockState blockState : treeFellerBlocks) {
             Block block = blockState.getBlock();
 
-            final var simBreak = EventUtils.simulateBlockBreak(block, player, FakeBlockBreakEventType.TREE_FELLER);
-            if (!lenient && !simBreak) continue;
+            if (!lenient && !EventUtils.simulateBlockBreak(block, player, FakeBlockBreakEventType.TREE_FELLER)) {
+                continue;
+            }
 
             Material type = block.getType();
             blocks.put(type, blocks.getOrDefault(type, 0) + 1);
