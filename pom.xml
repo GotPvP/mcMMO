@@ -370,7 +370,7 @@
             <artifactId>Skyblock</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/../OPBlocks/lib/Skyblock-1.0.0.jar</systemPath>
+            <systemPath>${pom.basedir}/../OPBlocks/lib/Skyblock.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>

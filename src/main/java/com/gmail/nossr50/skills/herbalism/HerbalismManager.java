@@ -281,9 +281,7 @@ public class HerbalismManager extends SkillManager {
         //TODO: The design of Green Terra needs to change, this is a mess
         if (Permissions.greenThumbPlant(getPlayer(), originalBreak.getType())) {
             if (mcMMO.p.getGeneralConfig().isGreenThumbReplantableCrop(originalBreak.getType())) {
-                if (!getPlayer().isSneaking()) {
-                    greenThumbActivated = processGreenThumbPlants(originalBreak, blockBreakEvent, isGreenTerraActive());
-                }
+                greenThumbActivated = processGreenThumbPlants(originalBreak, blockBreakEvent, isGreenTerraActive());
             }
         }
 
